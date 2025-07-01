@@ -12,4 +12,4 @@ else
 fi
 
 # Start Code Server
-exec /usr/bin/code-server --auth none --port 8080 /home/coder/project
+exec /usr/bin/code-server --auth none --host 0.0.0.0 --port 8080 /home/coder/project

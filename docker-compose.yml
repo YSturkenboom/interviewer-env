@@ -16,7 +16,6 @@ services:
       - "5000:5000" # backend preview port
     depends_on:
       - db
-    command: --auth=none  # TODO reverse proxy remove before live!
 
   db:
     image: postgres:15

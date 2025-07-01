@@ -5,21 +5,23 @@ services:
     image: codercom/code-server:latest
     container_name: code-server
     environment:
-      - PASSWORD=secret123        # Change for production
+      - PASSWORD=secret123
     volumes:
       - ./workspace:/home/coder/project
     ports:
       - "8443:8080"
+      - "3000:3000"   # Frontend preview port
+      - "5000:5000"   # Backend preview port
     depends_on:
       - db
-
+    command: --auth=none  # TODO reverse proxy remove before live!
   db:
     image: postgres:15
     container_name: interview-db
     environment:
-      - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD=testpass
-      - POSTGRES_DB=testdb
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
@@ -28,4 +30,3 @@ services:
 
 volumes:
   db_data:
-

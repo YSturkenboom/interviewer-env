@@ -2,19 +2,22 @@ version: '3.8'
 
 services:
   code-server:
-    image: codercom/code-server:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.code-server
     container_name: code-server
     environment:
       - PASSWORD=secret123
     volumes:
       - ./workspace:/home/coder/project
     ports:
-      - "8443:8080"
-      - "3000:3000"   # Frontend preview port
-      - "5000:5000"   # Backend preview port
+      - "8443:8080" # code-server port
+      - "3000:3000" # frontend preview port
+      - "5000:5000" # backend preview port
     depends_on:
       - db
     command: --auth=none  # TODO reverse proxy remove before live!
+
   db:
     image: postgres:15
     container_name: interview-db

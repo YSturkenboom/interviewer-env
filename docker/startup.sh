@@ -6,7 +6,7 @@ TARGET_DIR="/home/coder/project/pizza-shop-challenge"
 # Clone repo only if not already cloned
 if [ ! -d "$TARGET_DIR" ]; then
   echo "Cloning assignment repo into $TARGET_DIR..."
-  git clone "$REPO_URL" "$TARGET_DIR"
+  sudo git clone "$REPO_URL" "$TARGET_DIR"
 else
   echo "Repo already exists at $TARGET_DIR"
 fi

@@ -3,17 +3,14 @@ FROM codercom/code-server:latest
 # Switch to root to install packages and set permissions
 USER root
 
-# Install git, curl, Node.js (LTS), and Yarn
-RUN apt-get update && apt-get install -y git curl && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g yarn && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# # Install git, curl, Node.js (LTS), and Yarn
+# RUN apt-get update && apt-get install -y git curl && \
+#     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+#     apt-get install -y nodejs && \
+#     npm install -g yarn && \
+#     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./docker/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
-
-# Revert to default non-root user
-USER coder
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]

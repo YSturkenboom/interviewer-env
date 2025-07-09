@@ -30,6 +30,24 @@ else
   echo "Yarn is already installed: $(yarn -v)"
 fi
 
+# Install dependencies in frontend and backend
+echo "Installing dependencies..."
+cd "$TARGET_DIR"
+
+if [ -d "frontend" ]; then
+  echo "Installing frontend dependencies..."
+  cd frontend
+  sudo npm i
+  cd ..
+fi
+
+if [ -d "backend" ]; then
+  echo "Installing backend dependencies..."
+  cd backend
+  sudo npm i
+  cd ..
+fi
+
 # Start Code Server
 echo "Starting Code Server..."
 exec /usr/bin/code-server \
@@ -37,3 +55,10 @@ exec /usr/bin/code-server \
   --host 0.0.0.0 \
   --port 8080 \
   "$TARGET_DIR"
+
+# Send callback to your server
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-awstats-ec2-metadata-token-ttl-seconds: 21600")
+WEBHOOK_URL="https://8a871d63fd37.ngrok-free.app/api/containers/webhooks"
+INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+PUBLIC_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"status\":\"ready\"}"

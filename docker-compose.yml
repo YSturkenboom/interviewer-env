@@ -9,7 +9,7 @@ services:
     environment:
       - PASSWORD=secret123
     volumes:
-      - ./workspace:/home/coder/project
+      - ./workspace:/home/ubuntu/interviewer-env
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port

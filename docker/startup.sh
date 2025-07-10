@@ -6,7 +6,7 @@ LOG_FILE="/home/ubuntu/startup.log"
 
 {
   CHALLENGE_REPO_URL="https://github.com/Otellu/pizza-shop-challenge.git"
-  TARGET_DIR="/home/ubuntu/interviewer-env/workspace"
+  TARGET_DIR="/home/ubuntu/interviewer-env"
 
   # Clone repo only if not already cloned
   if [ ! -d "$TARGET_DIR" ]; then

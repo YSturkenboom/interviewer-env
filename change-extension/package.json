@@ -1,0 +1,34 @@
+{
+  "name": "live-diff-uploader",
+  "displayName": "Live Diff Uploader",
+  "description": "Streams live unsaved code diffs to backend every 10 seconds.",
+  "version": "0.0.1",
+  "publisher": "cruit",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {},
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/diff": "^7.0.2",
+    "@types/micromatch": "^4.0.9",
+    "@types/node-fetch": "^2.6.12",
+    "typescript": "^4.8.4",
+    "vsce": "^2.10.0",
+    "vscode": "^1.1.37"
+  },
+  "dependencies": {
+    "diff": "^5.1.0",
+    "micromatch": "^4.0.5",
+    "node-fetch": "^2.6.1"
+  }
+}

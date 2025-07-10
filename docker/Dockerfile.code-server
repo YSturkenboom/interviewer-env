@@ -2,6 +2,7 @@ FROM codercom/code-server:latest
 
 # Switch to root to install packages and set permissions
 USER root
+COPY ./change-extension/live-diff-uploader-0.0.1.vsix /tmp/my-extension.vsix
 
 # # Install git, curl, Node.js (LTS), and Yarn
 # RUN apt-get update && apt-get install -y git curl && \
@@ -14,3 +15,4 @@ COPY ./docker/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
+RUN code-server --install-extension /tmp/my-extension.vsix

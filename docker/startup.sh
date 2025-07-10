@@ -8,7 +8,7 @@ LOG_FILE="/home/ubuntu/startup.log"
   echo "Running setup..."
 
   CHALLENGE_REPO_URL="https://github.com/Otellu/pizza-shop-challenge.git"
-  TARGET_DIR="/home/ubuntu/interviewer-env"
+  TARGET_DIR="/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge"
 
   # Clone repo only if not already cloned
   if [ ! -d "$TARGET_DIR" ]; then
@@ -40,15 +40,31 @@ LOG_FILE="/home/ubuntu/startup.log"
   cd "$TARGET_DIR"
 
   if [ -d "frontend" ]; then
-    echo "Installing frontend dependencies..."
     cd frontend
+    
+    # Create frontend .env file
+    echo "Creating frontend .env file..."
+    sudo tee .env > /dev/null << 'EOF'
+REACT_APP_API_URL=http://localhost:5000/api
+EOF
+
+    echo "Installing frontend dependencies..."
     sudo npm i
     cd ..
   fi
 
   if [ -d "backend" ]; then
-    echo "Installing backend dependencies..."
     cd backend
+
+    # Create backend .env file
+    echo "Creating backend .env file..."
+    sudo tee .env > /dev/null << 'EOF'
+MONGO_URI=mongodb+srv://admininterview:test123@devcluster.gifvk5p.mongodb.net/pizza-shop?retryWrites=true&w=majority&appName=DevCluster
+PORT=5000
+JWT_SECRET=secret
+EOF
+
+    echo "Installing backend dependencies..."
     sudo npm i
     cd ..
   fi
@@ -79,7 +95,7 @@ LOG_FILE="/home/ubuntu/startup.log"
   echo "Sending setup complete webhook..."
 
   TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-awstats-ec2-metadata-token-ttl-seconds: 21600")
-  WEBHOOK_URL="https://8a871d63fd37.ngrok-free.app/api/containers/webhooks"
+  WEBHOOK_URL=" https://ac2641adecb3.ngrok-free.app/api/containers/webhooks"
   INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
   PUBLIC_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
 

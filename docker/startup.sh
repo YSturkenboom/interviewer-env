@@ -58,13 +58,15 @@ EOF
   cd ..
 fi
 
-# Start Code Server, prevent container from exiting
-echo "🚀 Launching Code Server (blocking)..."
-exec /usr/bin/code-server \
+# 🔁 Start code-server in background
+echo "🚀 Starting Code Server..."
+/usr/bin/code-server \
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$TARGET_DIR"
+  "$TARGET_DIR" &
+
+CODE_SERVER_PID=$!
 
 # Wait for Code Server
 echo "⏳ Waiting for Code Server..."
@@ -111,3 +113,7 @@ curl -s -X POST "$WEBHOOK_URL" \
   -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"status\":\"ready\"}" \
   && echo "✅ Webhook sent." \
   || echo "❌ Webhook failed"
+
+# 🔒 Now foreground the Code Server process to keep the container alive
+echo "🔒 Attaching to Code Server process"
+wait $CODE_SERVER_PID

@@ -1,7 +1,16 @@
 import * as vscode from 'vscode';
-import fetch from 'node-fetch';
 import * as jsdiff from 'diff';
 import micromatch from 'micromatch';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import * as path from 'path';
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+  },
+});
 
 type Snapshot = {
   uri: string;
@@ -27,7 +36,37 @@ function isIgnored(uri: string): boolean {
   return micromatch.isMatch(filePath, ignorePatterns);
 }
 
+const bucket = process.env.AWS_BUCKET || 'fallback-bucket';
+async function uploadSnapshot(
+  interviewTakenId: string,
+  filename: string,
+  content: string
+) {
+  const key = `coding-snapshots/${interviewTakenId}/snapshots/${Date.now()}_${path.basename(filename)}`;
+
+  try {
+    const res = await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: content,
+        ContentType: 'text/plain',
+      })
+    );
+
+    console.log(`✅ Uploaded snapshot to S3: ${key}`);
+  } catch (err) {
+    console.error('❌ Failed to upload snapshot:', err);
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
+  const interviewTakenId = process.env.INTERVIEW_TAKEN_ID!;
+  if (!interviewTakenId) {
+    vscode.window.showErrorMessage(
+      '⚠️ INTERVIEW_TAKEN_ID environment variableN is missing. Snapshots will not be saved.\nplease contact us.'
+    );
+  }
   vscode.workspace.onDidChangeTextDocument(event => {
     const uri = event.document.uri.toString();
     if (isIgnored(uri)) return;
@@ -75,16 +114,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (batch.length > 0) {
       try {
-        //TODO :: Batch upload to S3
-        // await fetch('https://flexible-sound-mustang.ngrok-free.app/api/code-diff/batch', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({
-        //     timestamp: Date.now(),
-        //     diffs: batch,
-        //   }),
-        // });
-        console.log(`[${new Date().toISOString()}] Sent ${batch.length} diffs`);
+        for (const file of batch) {
+          await uploadSnapshot(interviewTakenId, file.filename, file.diff);
+        }
+        console.log(`[${new Date().toISOString()}] Sent ${batch.length} diffs : INtervieew==>${interviewTakenId}`);
         console.log(`[${new Date().toISOString()}] Batch: ${JSON.stringify(batch)}`);
       } catch (err) {
         console.error('Failed to upload batch diffs:', err);

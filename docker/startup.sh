@@ -58,15 +58,13 @@ EOF
   cd ..
 fi
 
-# Start Code Server
-echo "🚀 Starting Code Server..."
-/usr/bin/code-server \
+# Start Code Server, prevent container from exiting
+echo "🚀 Launching Code Server (blocking)..."
+exec /usr/bin/code-server \
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$TARGET_DIR" &
-
-CODE_SERVER_PID=$!
+  "$TARGET_DIR"
 
 # Wait for Code Server
 echo "⏳ Waiting for Code Server..."

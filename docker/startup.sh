@@ -1,8 +1,6 @@
 #!/bin/bash
 
 set -uo pipefail
-LOG_FILE="/home/ubuntu/startup.log"
-exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "🟢 Interview environment setup started at $(date)"
 
@@ -23,7 +21,7 @@ if ! command -v node >/dev/null 2>&1; then
   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
   sudo apt-get install -y nodejs
 else
-  echo "Node.js is already installed: $(node -v)"
+  echo "✅ Node.js is already installed: $(node -v)"
 fi
 
 if ! command -v yarn >/dev/null 2>&1; then
@@ -31,7 +29,7 @@ if ! command -v yarn >/dev/null 2>&1; then
   sudo corepack enable
   sudo corepack prepare yarn@stable --activate
 else
-  echo "Yarn is already installed: $(yarn -v)"
+  echo "✅ Yarn is already installed: $(yarn -v)"
 fi
 
 # Install frontend dependencies
@@ -82,19 +80,36 @@ for i in {1..30}; do
   fi
 done
 
-# Send callback to your server
-echo "📡 Sending setup complete webhook..."
+# Get the metadata token
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-awstats-ec2-metadata-token-ttl-seconds: 21600")
-WEBHOOK_URL=" https://ac2641adecb3.ngrok-free.app/api/containers/webhooks"
-INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
-PUBLIC_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+# Validate token
+if [ -z "$TOKEN" ]; then
+  echo "❌ Failed to retrieve EC2 metadata token"
+  exit 1
+fi
 
-curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" \
+# Set the webhook URL
+WEBHOOK_URL="https://ac2641adecb3.ngrok-free.app/api/containers/webhooks"
+
+# Get instance ID and public IP
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/instance-id)
+
+PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/public-ipv4)
+
+# Validate values
+if [ -z "$INSTANCE_ID" ] || [ -z "$PUBLIC_IP" ]; then
+  echo "❌ Failed to retrieve instance metadata"
+  exit 1
+fi
+
+# Send webhook
+echo "📡 Sending webhook..."
+curl -s -X POST "$WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
   -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"status\":\"ready\"}" \
+  && echo "✅ Webhook sent." \
   || echo "❌ Webhook failed"
-
-echo "✅ Webhook sent. Logs at $LOG_FILE"
-
-# Attach foreground to code-server
-wait $CODE_SERVER_PID

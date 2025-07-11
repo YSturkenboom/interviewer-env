@@ -4,13 +4,12 @@ set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
-CHALLENGE_REPO_URL="https://github.com/Otellu/pizza-shop-challenge.git"
-TARGET_DIR="/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge"
-
+TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
+  
 # Clone repo only if not already cloned
 if [ ! -d "$TARGET_DIR" ]; then
   echo "📥 Cloning assignment repo into $TARGET_DIR..."
-  sudo git clone "$CHALLENGE_REPO_URL" "$TARGET_DIR"
+  sudo git clone "$REPO_URL" "$TARGET_DIR"
 else
   echo "✅ Repo already exists at $TARGET_DIR"
 fi

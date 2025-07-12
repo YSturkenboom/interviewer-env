@@ -8,8 +8,13 @@ services:
     container_name: code-server
     environment:
       - PASSWORD=secret123
+      - INTERVIEW_TAKEN_ID=${INTERVIEW_TAKEN_ID}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
     volumes:
-      - ./workspace:/home/coder/project
+      - ./workspace:/home/ubuntu/interviewer-env
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port

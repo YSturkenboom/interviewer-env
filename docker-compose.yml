@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   code-server:
@@ -13,22 +13,22 @@ services:
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port
-      - "5000:5000" # backend preview port
+      - "5001:5001" # backend preview port
     depends_on:
       - db
 
   db:
-    image: postgres:15
+    image: mongo:6.0
     container_name: interview-db
     environment:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpass
-      POSTGRES_DB: testdb
+      MONGO_INITDB_ROOT_USERNAME: testuser
+      MONGO_INITDB_ROOT_PASSWORD: testpass
+      MONGO_INITDB_DATABASE: testdb
     volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./initdb:/docker-entrypoint-initdb.d
+      - db_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - "27017:27017"
 
 volumes:
   db_data:

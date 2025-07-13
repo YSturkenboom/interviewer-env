@@ -1,18 +1,40 @@
+# docker/Dockerfile.code-server
 FROM codercom/code-server:latest
 
 # Switch to root to install packages and set permissions
 USER root
+
+# Install additional dependencies for API server and archiving
+RUN apt-get update && apt-get install -y \
+    zip \
+    unzip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js dependencies for API server
+RUN npm install -g \
+    express \
+    archiver \
+    @aws-sdk/client-s3
+
+# Copy the VS Code extension
 COPY ./change-extension/live-diff-uploader-0.0.1.vsix /tmp/my-extension.vsix
 
-# # Install git, curl, Node.js (LTS), and Yarn
-# RUN apt-get update && apt-get install -y git curl && \
-#     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-#     apt-get install -y nodejs && \
-#     npm install -g yarn && \
-#     apt-get clean && rm -rf /var/lib/apt/lists/*
-
+# Copy API server and startup script
+COPY ./docker/api-server.js /home/coder/api-server.js
 COPY ./docker/startup.sh /usr/local/bin/startup.sh
+
+# Make scripts executable
 RUN chmod +x /usr/local/bin/startup.sh
+RUN chmod +x /home/coder/api-server.js
+
+# Install the VS Code extension
+RUN code-server --install-extension /tmp/my-extension.vsix
+
+# Set proper ownership
+RUN chown -R coder:coder /home/coder/
+
+# Switch back to coder user
+USER coder
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
-RUN code-server --install-extension /tmp/my-extension.vsix

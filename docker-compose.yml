@@ -11,12 +11,15 @@ services:
       - AWS_BUCKET=${AWS_BUCKET}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
+      - REPO_NAME=${REPO_NAME}
+      - REPO_URL=${REPO_URL}
     volumes:
       - ./workspace:/home/ubuntu/interviewer-env
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port
       - "5000:5000" # backend preview port
+      - "9000:9000" # API server port for workspace operations
     depends_on:
       - mongo-db
 

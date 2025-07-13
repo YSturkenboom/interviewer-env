@@ -152,7 +152,7 @@ echo "🚀 Starting Code Server..."
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$FINAL_TARGET_DIR" &
+  "/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge" &
 
 CODE_SERVER_PID=$!
 

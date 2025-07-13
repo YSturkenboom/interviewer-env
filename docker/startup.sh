@@ -19,11 +19,28 @@ else
   TARGET_DIR="/tmp/workspace"
 fi
 
-# Check if REPO_URL and REPO_NAME are set
-if [ -z "${REPO_URL:-}" ] || [ -z "${REPO_NAME:-}" ]; then
-  echo "⚠️ REPO_URL or REPO_NAME not set. Creating default workspace..."
-  echo "REPO_URL: ${REPO_URL:-'not set'}"
-  echo "REPO_NAME: ${REPO_NAME:-'not set'}"
+# Check if pizza-shop-challenge already exists (cloned by userDataScript)
+if [ -d "/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge" ]; then
+  echo "✅ Found pizza-shop-challenge directory from userDataScript"
+  FINAL_TARGET_DIR="/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge"
+elif [ ! -z "${REPO_URL:-}" ] && [ ! -z "${REPO_NAME:-}" ]; then
+  # Clone the challenge repo if it doesn't exist
+  echo "📥 Cloning challenge repo: $REPO_URL"
+  FINAL_TARGET_DIR="$TARGET_DIR/$REPO_NAME"
+  
+  if [ ! -d "$FINAL_TARGET_DIR" ]; then
+    git clone "$REPO_URL" "$FINAL_TARGET_DIR" || {
+      echo "❌ Failed to clone challenge repo. Creating default workspace..."
+      FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
+      mkdir -p "$FINAL_TARGET_DIR"
+      echo "# Default Workspace - Challenge repo failed to clone" > "$FINAL_TARGET_DIR/README.md"
+    }
+  else
+    echo "✅ Challenge repo already exists at $FINAL_TARGET_DIR"
+  fi
+else
+  # Create default workspace if no repo info
+  echo "⚠️ No REPO_URL or REPO_NAME set. Creating default workspace..."
   FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
   mkdir -p "$FINAL_TARGET_DIR"
   
@@ -44,22 +61,6 @@ This is your interview coding environment.
 
 Happy coding!
 EOF
-
-else
-  FINAL_TARGET_DIR="$TARGET_DIR/$REPO_NAME"
-  
-  # Clone repo only if not already cloned
-  if [ ! -d "$FINAL_TARGET_DIR" ]; then
-    echo "📥 Cloning assignment repo into $FINAL_TARGET_DIR..."
-    git clone "$REPO_URL" "$FINAL_TARGET_DIR" || {
-      echo "❌ Failed to clone repo. Creating default workspace..."
-      FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
-      mkdir -p "$FINAL_TARGET_DIR"
-      echo "# Default Workspace" > "$FINAL_TARGET_DIR/README.md"
-    }
-  else
-    echo "✅ Repo already exists at $FINAL_TARGET_DIR"
-  fi
 fi
 
 # Install Node.js, npm, and Yarn if not already present
@@ -146,13 +147,14 @@ if ! curl -s http://localhost:9000/health > /dev/null 2>&1; then
   fi
 fi
 
-# 🔁 Start code-server in background
+# 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
+echo "📂 Opening workspace: $FINAL_TARGET_DIR"
 /usr/bin/code-server \
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge" &
+  "$FINAL_TARGET_DIR" &
 
 CODE_SERVER_PID=$!
 

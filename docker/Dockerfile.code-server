@@ -14,19 +14,22 @@ RUN apt-get update && apt-get install -y \
 
 # Install Node.js (the code-server image doesn't have npm by default)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
-
-# Install Node.js dependencies for API server
-RUN npm install -g \
-    express \
-    archiver \
-    @aws-sdk/client-s3
+    && apt-get install -y nodejs \
+    && node --version \
+    && npm --version
 
 # Copy the VS Code extension
 COPY change-extension/live-diff-uploader-0.0.1.vsix /tmp/my-extension.vsix
 
-# Copy API server and startup script
+# Copy API server first
 COPY docker/api-server.js /home/coder/api-server.js
+
+# Install Node.js dependencies locally in coder home directory
+RUN cd /home/coder \
+    && npm install express archiver @aws-sdk/client-s3 \
+    && echo "Local npm packages installed"
+
+# Copy startup script
 COPY docker/startup.sh /usr/local/bin/startup.sh
 
 # Make scripts executable

@@ -108,9 +108,9 @@ EOF
   cd ..
 fi
 
-# 🚀 Start API server in background
+# 🚀 Start API server in background (from correct directory)
 echo "🛠️ Starting API Server..."
-node /home/coder/api-server.js &
+cd /home/coder && node api-server.js &
 API_SERVER_PID=$!
 
 # Wait for API server to start
@@ -134,7 +134,7 @@ if ! curl -s http://localhost:9000/health > /dev/null 2>&1; then
     echo "API server process died. Checking logs..."
     # Try to start it manually to see errors
     echo "Attempting to start API server manually..."
-    node /home/coder/api-server.js &
+    cd /home/coder && node api-server.js &
     NEW_API_PID=$!
     sleep 3
     if ps -p $NEW_API_PID > /dev/null 2>&1; then

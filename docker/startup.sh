@@ -5,18 +5,18 @@ set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
-# Create base directory if it doesn't exist (with proper permissions)
+# Create base directory structure with fallbacks
 echo "📁 Setting up workspace directory..."
-if [ ! -d "/home/ubuntu/interviewer-env/workspace" ]; then
-  echo "Creating workspace directory..."
-  mkdir -p /home/ubuntu/interviewer-env/workspace 2>/dev/null || {
-    echo "⚠️ Cannot create workspace as coder user, directory should exist from Docker build"
-  }
-fi
+TARGET_DIR="/tmp/workspace"  # Use /tmp as fallback since it's always writable
 
-# Ensure proper ownership (if needed)
-if [ ! -w "/home/ubuntu/interviewer-env/workspace" ]; then
-  echo "⚠️ Workspace not writable, this may cause issues"
+# Try to create the ideal location first
+if sudo mkdir -p /home/ubuntu/interviewer-env/workspace && sudo chown -R coder:coder /home/ubuntu/interviewer-env; then
+  echo "✅ Created workspace in /home/ubuntu/interviewer-env/workspace"
+  TARGET_DIR="/home/ubuntu/interviewer-env/workspace"
+else
+  echo "⚠️ Using fallback workspace directory: /tmp/workspace"
+  mkdir -p /tmp/workspace
+  TARGET_DIR="/tmp/workspace"
 fi
 
 # Check if REPO_URL and REPO_NAME are set
@@ -24,11 +24,11 @@ if [ -z "${REPO_URL:-}" ] || [ -z "${REPO_NAME:-}" ]; then
   echo "⚠️ REPO_URL or REPO_NAME not set. Creating default workspace..."
   echo "REPO_URL: ${REPO_URL:-'not set'}"
   echo "REPO_NAME: ${REPO_NAME:-'not set'}"
-  TARGET_DIR="/home/ubuntu/interviewer-env/workspace/default-workspace"
-  mkdir -p "$TARGET_DIR"
+  FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
+  mkdir -p "$FINAL_TARGET_DIR"
   
   # Create a simple default setup
-  cat > "$TARGET_DIR/README.md" << 'EOF'
+  cat > "$FINAL_TARGET_DIR/README.md" << 'EOF'
 # Interview Workspace
 
 This is your interview coding environment.
@@ -46,18 +46,19 @@ Happy coding!
 EOF
 
 else
-  TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
+  FINAL_TARGET_DIR="$TARGET_DIR/$REPO_NAME"
   
   # Clone repo only if not already cloned
-  if [ ! -d "$TARGET_DIR" ]; then
-    echo "📥 Cloning assignment repo into $TARGET_DIR..."
-    git clone "$REPO_URL" "$TARGET_DIR" || {
+  if [ ! -d "$FINAL_TARGET_DIR" ]; then
+    echo "📥 Cloning assignment repo into $FINAL_TARGET_DIR..."
+    git clone "$REPO_URL" "$FINAL_TARGET_DIR" || {
       echo "❌ Failed to clone repo. Creating default workspace..."
-      TARGET_DIR="/home/ubuntu/interviewer-env/workspace/default-workspace"
-      mkdir -p "$TARGET_DIR"
+      FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
+      mkdir -p "$FINAL_TARGET_DIR"
+      echo "# Default Workspace" > "$FINAL_TARGET_DIR/README.md"
     }
   else
-    echo "✅ Repo already exists at $TARGET_DIR"
+    echo "✅ Repo already exists at $FINAL_TARGET_DIR"
   fi
 fi
 
@@ -79,7 +80,10 @@ else
 fi
 
 # Install frontend dependencies
-cd "$TARGET_DIR" || exit 1
+cd "$FINAL_TARGET_DIR" || {
+  echo "❌ Cannot access target directory: $FINAL_TARGET_DIR"
+  exit 1
+}
 
 if [ -d "frontend" ]; then
   cd frontend
@@ -112,7 +116,7 @@ API_SERVER_PID=$!
 # Wait for API server to start
 echo "⏳ Waiting for API server..."
 for i in {1..15}; do
-  if curl -s http://localhost:9000/health > /dev/null; then
+  if curl -s http://localhost:9000/health > /dev/null 2>&1; then
     echo "✅ API Server is up!"
     break
   else
@@ -121,20 +125,41 @@ for i in {1..15}; do
   fi
 done
 
+# Test API server manually if still not working
+if ! curl -s http://localhost:9000/health > /dev/null 2>&1; then
+  echo "❌ API Server failed to start. Checking process..."
+  if ps -p $API_SERVER_PID > /dev/null 2>&1; then
+    echo "API server process is running but not responding"
+  else
+    echo "API server process died. Checking logs..."
+    # Try to start it manually to see errors
+    echo "Attempting to start API server manually..."
+    node /home/coder/api-server.js &
+    NEW_API_PID=$!
+    sleep 3
+    if ps -p $NEW_API_PID > /dev/null 2>&1; then
+      API_SERVER_PID=$NEW_API_PID
+      echo "✅ API Server started manually"
+    else
+      echo "❌ API Server failed to start manually"
+    fi
+  fi
+fi
+
 # 🔁 Start code-server in background
 echo "🚀 Starting Code Server..."
 /usr/bin/code-server \
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$TARGET_DIR" &
+  "$FINAL_TARGET_DIR" &
 
 CODE_SERVER_PID=$!
 
 # Wait for Code Server
 echo "⏳ Waiting for Code Server..."
 for i in {1..30}; do
-  if curl -s http://localhost:8080 > /dev/null; then
+  if curl -s http://localhost:8080 > /dev/null 2>&1; then
     echo "✅ Code Server is up!"
     break
   else
@@ -204,6 +229,14 @@ cleanup() {
 
 # Set up signal handlers
 trap cleanup SIGTERM SIGINT
+
+# Print final status
+echo "========================================"
+echo "🎉 Setup completed!"
+echo "📂 Workspace: $FINAL_TARGET_DIR"
+echo "🔗 Code Server: http://localhost:8080"
+echo "🛠️ API Server: http://localhost:9000"
+echo "========================================"
 
 # 🔒 Wait for both processes
 echo "🔒 All services running. Waiting for shutdown signal..."

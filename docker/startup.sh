@@ -1,17 +1,51 @@
 #!/bin/bash
+# docker/startup.sh
 
 set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
-TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
+# Create base directory if it doesn't exist
+mkdir -p /home/ubuntu/interviewer-env/workspace
+
+# Check if REPO_URL and REPO_NAME are set
+if [ -z "$REPO_URL" ] || [ -z "$REPO_NAME" ]; then
+  echo "⚠️ REPO_URL or REPO_NAME not set. Creating default workspace..."
+  TARGET_DIR="/home/ubuntu/interviewer-env/workspace/default-workspace"
+  mkdir -p "$TARGET_DIR"
   
-# Clone repo only if not already cloned
-if [ ! -d "$TARGET_DIR" ]; then
-  echo "📥 Cloning assignment repo into $TARGET_DIR..."
-  sudo git clone "$REPO_URL" "$TARGET_DIR"
+  # Create a simple default setup
+  cat > "$TARGET_DIR/README.md" << 'EOF'
+# Interview Workspace
+
+This is your interview coding environment.
+
+## Available Tools
+- Node.js and npm
+- MongoDB (available at localhost:27017)
+- Code editor with extensions
+
+## API Endpoints
+- Save workspace: POST /api/save-workspace
+- Health check: GET /health
+
+Happy coding!
+EOF
+
 else
-  echo "✅ Repo already exists at $TARGET_DIR"
+  TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
+  
+  # Clone repo only if not already cloned
+  if [ ! -d "$TARGET_DIR" ]; then
+    echo "📥 Cloning assignment repo into $TARGET_DIR..."
+    git clone "$REPO_URL" "$TARGET_DIR" || {
+      echo "❌ Failed to clone repo. Creating default workspace..."
+      TARGET_DIR="/home/ubuntu/interviewer-env/workspace/default-workspace"
+      mkdir -p "$TARGET_DIR"
+    }
+  else
+    echo "✅ Repo already exists at $TARGET_DIR"
+  fi
 fi
 
 # Install Node.js, npm, and Yarn if not already present
@@ -56,6 +90,23 @@ EOF
   sudo npm install || echo "❌ Backend install failed"
   cd ..
 fi
+
+# 🚀 Start API server in background
+echo "🛠️ Starting API Server..."
+node /home/coder/api-server.js &
+API_SERVER_PID=$!
+
+# Wait for API server to start
+echo "⏳ Waiting for API server..."
+for i in {1..15}; do
+  if curl -s http://localhost:9000/health > /dev/null; then
+    echo "✅ API Server is up!"
+    break
+  else
+    echo "⏱️ Waiting for API server... ($i)"
+    sleep 2
+  fi
+done
 
 # 🔁 Start code-server in background
 echo "🚀 Starting Code Server..."
@@ -113,6 +164,34 @@ curl -s -X POST "$WEBHOOK_URL" \
   && echo "✅ Webhook sent." \
   || echo "❌ Webhook failed"
 
-# 🔒 Now foreground the Code Server process to keep the container alive
-echo "🔒 Attaching to Code Server process"
+# Function to handle shutdown gracefully
+cleanup() {
+  echo "🛑 Shutting down services..."
+  
+  # Kill API server
+  if [ ! -z "$API_SERVER_PID" ]; then
+    kill $API_SERVER_PID 2>/dev/null || true
+    echo "🛑 API Server stopped"
+  fi
+  
+  # Kill code server
+  if [ ! -z "$CODE_SERVER_PID" ]; then
+    kill $CODE_SERVER_PID 2>/dev/null || true
+    echo "🛑 Code Server stopped"
+  fi
+  
+  # Trigger final workspace save
+  echo "💾 Triggering final workspace save..."
+  curl -s -X POST http://localhost:9000/api/save-workspace \
+    -H "Content-Type: application/json" \
+    || echo "❌ Final save failed"
+  
+  exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGTERM SIGINT
+
+# 🔒 Wait for both processes
+echo "🔒 All services running. Waiting for shutdown signal..."
 wait $CODE_SERVER_PID

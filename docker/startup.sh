@@ -5,12 +5,25 @@ set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
-# Create base directory if it doesn't exist
-mkdir -p /home/ubuntu/interviewer-env/workspace
+# Create base directory if it doesn't exist (with proper permissions)
+echo "📁 Setting up workspace directory..."
+if [ ! -d "/home/ubuntu/interviewer-env/workspace" ]; then
+  echo "Creating workspace directory..."
+  mkdir -p /home/ubuntu/interviewer-env/workspace 2>/dev/null || {
+    echo "⚠️ Cannot create workspace as coder user, directory should exist from Docker build"
+  }
+fi
+
+# Ensure proper ownership (if needed)
+if [ ! -w "/home/ubuntu/interviewer-env/workspace" ]; then
+  echo "⚠️ Workspace not writable, this may cause issues"
+fi
 
 # Check if REPO_URL and REPO_NAME are set
-if [ -z "$REPO_URL" ] || [ -z "$REPO_NAME" ]; then
+if [ -z "${REPO_URL:-}" ] || [ -z "${REPO_NAME:-}" ]; then
   echo "⚠️ REPO_URL or REPO_NAME not set. Creating default workspace..."
+  echo "REPO_URL: ${REPO_URL:-'not set'}"
+  echo "REPO_NAME: ${REPO_NAME:-'not set'}"
   TARGET_DIR="/home/ubuntu/interviewer-env/workspace/default-workspace"
   mkdir -p "$TARGET_DIR"
   

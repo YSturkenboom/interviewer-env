@@ -198,11 +198,13 @@ fi
 
 # Read SUBDOMAIN from instance-info.txt if available
 if [ -f /home/ubuntu/instance-info.txt ]; then
+  set +u
   source /home/ubuntu/instance-info.txt
+  set -u
 fi
 
 # Fallback if SUBDOMAIN is not set
-if [ -z "$SUBDOMAIN" ]; then
+if [ -z "${SUBDOMAIN:-}" ]; then
   echo "❌ SUBDOMAIN not found in /home/ubuntu/instance-info.txt"
   exit 1
 fi

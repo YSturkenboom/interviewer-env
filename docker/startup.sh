@@ -181,7 +181,7 @@ if [ -z "$TOKEN" ]; then
 fi
 
 # Set the webhook URL from environment or use fallback
-WEBHOOK_URL="${WEBHOOK_URL:-https://cruit-europe.com/api/containers/webhooks}"
+WEBHOOK_URL="${WEBHOOK_URL:-https://zenno.loca.lt/api/containers/webhooks}"
 
 # Get instance ID and public IP
 INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
@@ -196,11 +196,23 @@ if [ -z "$INSTANCE_ID" ] || [ -z "$PUBLIC_IP" ]; then
   exit 1
 fi
 
+# Read SUBDOMAIN from instance-info.txt if available
+if [ -f /home/ubuntu/instance-info.txt ]; then
+  source /home/ubuntu/instance-info.txt
+fi
+
+# Fallback if SUBDOMAIN is not set
+if [ -z "$SUBDOMAIN" ]; then
+  echo "❌ SUBDOMAIN not found in /home/ubuntu/instance-info.txt"
+  exit 1
+fi
+
+SESSION_URL="https://${SUBDOMAIN}"
+
 # Send webhook
-echo "📡 Sending webhook..."
 curl -s -X POST "$WEBHOOK_URL" \
   -H "Content-Type: application/json" \
-  -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"status\":\"ready\"}" \
+  -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"session_url\":\"$SESSION_URL\",\"status\":\"ready\"}" \
   && echo "✅ Webhook sent." \
   || echo "❌ Webhook failed"
 

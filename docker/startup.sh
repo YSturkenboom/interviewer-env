@@ -183,8 +183,6 @@ WEBHOOK_PAYLOAD=$(cat <<EOF
   "session_url": "$SESSION_URL",
   "subdomain": "$SUBDOMAIN",
   "interview_taken_id": "$INTERVIEW_TAKEN_ID",
-  "challenge_repo": "$CHALLENGE_REPO",
-  "workspace_path": "$FINAL_TARGET_DIR",
   "status": "ready",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)"
 }

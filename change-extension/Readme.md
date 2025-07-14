@@ -1,1 +1,1 @@
-## Positively Do not uninstall the extension
+## Positively Do not uninstall or disable this extension

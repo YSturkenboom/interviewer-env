@@ -13,8 +13,9 @@ services:
       - AWS_REGION=${AWS_REGION}
       - REPO_NAME=${REPO_NAME}
       - REPO_URL=${REPO_URL}
-      - MONGO_URI=mongodb://localhost:27017/testdb
       - SUBDOMAIN=${SUBDOMAIN}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+
     volumes:
       - ./workspace:/home/ubuntu/interviewer-env
     ports:

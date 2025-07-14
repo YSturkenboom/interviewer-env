@@ -136,6 +136,9 @@ for i in {1..30}; do
   fi
 done
 
+# ✅ GET SUBDOMAIN FROM ENVIRONMENT VARIABLES
+echo "📖 Reading configuration from environment variables..."
+
 # Get the metadata token
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
   -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -162,15 +165,75 @@ if [ -z "$INSTANCE_ID" ] || [ -z "$PUBLIC_IP" ]; then
   exit 1
 fi
 
-# Subdomain is passed as an environment variable
+# Validate required environment variables
+echo "📋 Environment variables:"
+echo "  SUBDOMAIN: ${SUBDOMAIN:-'NOT SET'}"
+echo "  INTERVIEW_TAKEN_ID: ${INTERVIEW_TAKEN_ID:-'NOT SET'}"
+echo "  WEBHOOK_URL: ${WEBHOOK_URL:-'NOT SET'}"
+echo "  REPO_URL: ${REPO_URL:-'NOT SET'}"
+
+# Exit if SUBDOMAIN is missing
+if [ -z "${SUBDOMAIN:-}" ]; then
+  echo "❌ SUBDOMAIN environment variable is required but not set!"
+  echo "Make sure docker-compose.yml passes SUBDOMAIN from userDataScript"
+  exit 1
+fi
+
+# Set other variables with fallbacks
+INTERVIEW_TAKEN_ID="${INTERVIEW_TAKEN_ID:-unknown}"
+CHALLENGE_REPO="${REPO_URL:-https://github.com/Otellu/pizza-shop-challenge.git}"
+
+# Construct the session URL
 SESSION_URL="https://${SUBDOMAIN}"
 
-# Send webhook
-curl -s -X POST "$WEBHOOK_URL" \
-  -H "Content-Type: application/json" \
-  -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"session_url\":\"$SESSION_URL\",\"status\":\"ready\"}" \
-  && echo "✅ Webhook sent." \
-  || echo "❌ Webhook failed"
+# Prepare webhook payload
+WEBHOOK_PAYLOAD=$(cat <<EOF
+{
+  "instance_id": "$INSTANCE_ID",
+  "public_ip": "$PUBLIC_IP",
+  "session_url": "$SESSION_URL",
+  "subdomain": "$SUBDOMAIN",
+  "interview_taken_id": "$INTERVIEW_TAKEN_ID",
+  "challenge_repo": "$CHALLENGE_REPO",
+  "workspace_path": "$FINAL_TARGET_DIR",
+  "status": "ready",
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)"
+}
+EOF
+)
+
+# Send webhook with retry logic
+echo "📡 Sending webhook to: $WEBHOOK_URL"
+WEBHOOK_SUCCESS=false
+for i in {1..3}; do
+  echo "📡 Webhook attempt $i/3..."
+  
+  WEBHOOK_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$WEBHOOK_URL" \
+    -H "Content-Type: application/json" \
+    -d "$WEBHOOK_PAYLOAD")
+  
+  # Extract HTTP status code (last line)
+  HTTP_STATUS=$(echo "$WEBHOOK_RESPONSE" | tail -n1)
+  RESPONSE_BODY=$(echo "$WEBHOOK_RESPONSE" | head -n -1)
+  
+  if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
+    echo "✅ Webhook sent successfully (HTTP $HTTP_STATUS)"
+    echo "📋 Response: $RESPONSE_BODY"
+    WEBHOOK_SUCCESS=true
+    break
+  else
+    echo "❌ Webhook failed (HTTP $HTTP_STATUS)"
+    echo "📋 Response: $RESPONSE_BODY"
+    if [ $i -lt 3 ]; then
+      echo "⏱️ Retrying in 5 seconds..."
+      sleep 5
+    fi
+  fi
+done
+
+if [ "$WEBHOOK_SUCCESS" = false ]; then
+  echo "❌ All webhook attempts failed"
+fi
 
 # Function to handle shutdown gracefully
 cleanup() {
@@ -206,6 +269,7 @@ echo "🎉 Setup completed!"
 echo "📂 Workspace: $TARGET_DIR"
 echo "🔗 Code Server: http://localhost:8080"
 echo "🛠️ API Server: http://localhost:9000"
+echo "🌐 Session URL: $SESSION_URL"
 echo "========================================"
 
 # 🔒 Wait for both processes

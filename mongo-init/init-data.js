@@ -313,7 +313,6 @@ db.categories.insertMany([
     createdAt: new Date("2023-01-01"),
   },
 ]);
-create;
 
 // Create comprehensive indexes for performance
 // Users collection indexes

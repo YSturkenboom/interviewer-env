@@ -94,6 +94,14 @@ if ! curl -s http://localhost:9000/health > /dev/null 2>&1; then
   fi
 fi
 
+# 📦 Install the diff tracker extension
+echo "🚀 Installing diff tracker extension..."
+/usr/bin/code-server --install-extension /tmp/my-extension.vsix
+
+# 📦 Install MongoDB extension
+echo "🚀 Installing MongoDB extension..."
+/usr/bin/code-server --install-extension mongodb.mongodb-vscode
+
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
 echo "📂 Opening workspace: $TARGET_DIR"

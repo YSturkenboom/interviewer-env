@@ -196,17 +196,7 @@ if [ -z "$INSTANCE_ID" ] || [ -z "$PUBLIC_IP" ]; then
   exit 1
 fi
 
-# Read SUBDOMAIN from instance-info.txt if available
-if [ -f /home/ubuntu/instance-info.txt ]; then
-  source /home/ubuntu/instance-info.txt
-fi
-
-# Fallback if SUBDOMAIN is not set
-if [ -z "$SUBDOMAIN" ]; then
-  echo "❌ SUBDOMAIN not found in /home/ubuntu/instance-info.txt"
-  exit 1
-fi
-
+# Subdomain is passed as an environment variable
 SESSION_URL="https://${SUBDOMAIN}"
 
 # Send webhook

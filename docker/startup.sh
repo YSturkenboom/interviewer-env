@@ -9,25 +9,8 @@ TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
 
 # Clone the challenge repo
 echo "📂 Target directory: $TARGET_DIR"
-
-
-# Wait up to 60 seconds for the repo to be cloned
-echo "⏳ Waiting for repo to be available at $TARGET_DIR..."
-for i in {1..30}; do
-  if [ -d "$TARGET_DIR" ]; then
-    echo "✅ Repo found."
-    break
-  else
-    echo "⏱️ Waiting... ($i)"
-    sleep 2
-  fi
-done
-
-# If still not found, exit with error
-if [ ! -d "$TARGET_DIR" ]; then
-  echo "❌ Cannot access target directory: $TARGET_DIR"
-  exit 1
-fi
+echo "📥 Cloning challenge repository..."
+git clone $CHALLENGE_REPO_URL $TARGET_DIR
 
 # Create a simple default setup
 cat > "$TARGET_DIR/README.md" << 'EOF'

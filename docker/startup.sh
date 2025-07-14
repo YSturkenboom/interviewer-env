@@ -197,7 +197,7 @@ if [ -z "$INSTANCE_ID" ] || [ -z "$PUBLIC_IP" ]; then
 fi
 
 # Send webhook
-echo "📡 Sending webhook..."
+echo "📡 Sending webhook... $WEBHOOK_URL"
 curl -s -X POST "$WEBHOOK_URL" \
   -H "Content-Type: application/json" \
   -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"status\":\"ready\"}" \

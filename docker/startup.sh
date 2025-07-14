@@ -5,47 +5,14 @@ set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
-# Create base directory structure with fallbacks
-echo "📁 Setting up workspace directory..."
-TARGET_DIR="/tmp/workspace"  # Use /tmp as fallback since it's always writable
+TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
 
-# Try to create the ideal location first
-if sudo mkdir -p /home/ubuntu/interviewer-env/workspace && sudo chown -R coder:coder /home/ubuntu/interviewer-env; then
-  echo "✅ Created workspace in /home/ubuntu/interviewer-env/workspace"
-  TARGET_DIR="/home/ubuntu/interviewer-env/workspace"
-else
-  echo "⚠️ Using fallback workspace directory: /tmp/workspace"
-  mkdir -p /tmp/workspace
-  TARGET_DIR="/tmp/workspace"
-fi
-
-# Check if pizza-shop-challenge already exists (cloned by userDataScript)
-if [ -d "/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge" ]; then
-  echo "✅ Found pizza-shop-challenge directory from userDataScript"
-  FINAL_TARGET_DIR="/home/ubuntu/interviewer-env/workspace/pizza-shop-challenge"
-elif [ ! -z "${REPO_URL:-}" ] && [ ! -z "${REPO_NAME:-}" ]; then
-  # Clone the challenge repo if it doesn't exist
-  echo "📥 Cloning challenge repo: $REPO_URL"
-  FINAL_TARGET_DIR="$TARGET_DIR/$REPO_NAME"
+# Clone the challenge repo
+echo "📥 Cloning challenge repo: $REPO_URL to $TARGET_DIR"
+git clone "$REPO_URL" "$TARGET_DIR" 
   
-  if [ ! -d "$FINAL_TARGET_DIR" ]; then
-    git clone "$REPO_URL" "$FINAL_TARGET_DIR" || {
-      echo "❌ Failed to clone challenge repo. Creating default workspace..."
-      FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
-      mkdir -p "$FINAL_TARGET_DIR"
-      echo "# Default Workspace - Challenge repo failed to clone" > "$FINAL_TARGET_DIR/README.md"
-    }
-  else
-    echo "✅ Challenge repo already exists at $FINAL_TARGET_DIR"
-  fi
-else
-  # Create default workspace if no repo info
-  echo "⚠️ No REPO_URL or REPO_NAME set. Creating default workspace..."
-  FINAL_TARGET_DIR="$TARGET_DIR/default-workspace"
-  mkdir -p "$FINAL_TARGET_DIR"
-  
-  # Create a simple default setup
-  cat > "$FINAL_TARGET_DIR/README.md" << 'EOF'
+# Create a simple default setup
+cat > "$TARGET_DIR/README.md" << 'EOF'
 # Interview Workspace
 
 This is your interview coding environment.
@@ -61,7 +28,6 @@ This is your interview coding environment.
 
 Happy coding!
 EOF
-fi
 
 # Install Node.js, npm, and Yarn if not already present
 if ! command -v node >/dev/null 2>&1; then
@@ -81,8 +47,8 @@ else
 fi
 
 # Install frontend dependencies
-cd "$FINAL_TARGET_DIR" || {
-  echo "❌ Cannot access target directory: $FINAL_TARGET_DIR"
+cd "$TARGET_DIR" || {
+  echo "❌ Cannot access target directory: $TARGET_DIR"
   exit 1
 }
 
@@ -149,12 +115,12 @@ fi
 
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
-echo "📂 Opening workspace: $FINAL_TARGET_DIR"
+echo "📂 Opening workspace: $TARGET_DIR"
 /usr/bin/code-server \
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$FINAL_TARGET_DIR" &
+  "$TARGET_DIR" &
 
 CODE_SERVER_PID=$!
 
@@ -237,7 +203,7 @@ trap cleanup SIGTERM SIGINT
 # Print final status
 echo "========================================"
 echo "🎉 Setup completed!"
-echo "📂 Workspace: $FINAL_TARGET_DIR"
+echo "📂 Workspace: $TARGET_DIR"
 echo "🔗 Code Server: http://localhost:8080"
 echo "🛠️ API Server: http://localhost:9000"
 echo "========================================"

@@ -38,6 +38,9 @@ RUN chmod +x /usr/local/bin/startup.sh
 # Install the VS Code extension
 RUN code-server --install-extension /tmp/my-extension.vsix
 
+# Install MongoDB extension
+RUN code-server --install-extension mongodb.mongodb-vscode
+
 # Create workspace directory with proper permissions
 RUN mkdir -p /home/ubuntu/interviewer-env/workspace \
     && chown -R coder:coder /home/ubuntu/interviewer-env

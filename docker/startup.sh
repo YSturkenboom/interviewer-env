@@ -180,8 +180,8 @@ if [ -z "$TOKEN" ]; then
   exit 1
 fi
 
-# Set the webhook URL
-WEBHOOK_URL="https://ac2641adecb3.ngrok-free.app/api/containers/webhooks"
+# Set the webhook URL from environment or use fallback
+WEBHOOK_URL="${WEBHOOK_URL:-https://cruit-europe.com/api/containers/webhooks}"
 
 # Get instance ID and public IP
 INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \

@@ -6,29 +6,14 @@ set -uo pipefail
 echo "🟢 Interview environment setup started at $(date)"
 
 TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
-
-# Clone the challenge repo
-echo "📂 Target directory: $TARGET_DIR"
-echo "📥 Cloning challenge repository..."
-git clone $CHALLENGE_REPO_URL $TARGET_DIR
-
-# Create a simple default setup
-cat > "$TARGET_DIR/README.md" << 'EOF'
-# Interview Workspace
-
-This is your interview coding environment.
-
-## Available Tools
-- Node.js and npm
-- MongoDB (available at localhost:27017)
-- Code editor with extensions
-
-## API Endpoints
-- Save workspace: POST /api/save-workspace
-- Health check: GET /health
-
-Happy coding!
-EOF
+  
+# Clone repo only if not already cloned
+if [ ! -d "$TARGET_DIR" ]; then
+  echo "📥 Cloning assignment repo into $TARGET_DIR..."
+  sudo git clone "$REPO_URL" "$TARGET_DIR"
+else
+  echo "✅ Repo already exists at $TARGET_DIR"
+fi
 
 # Install Node.js, npm, and Yarn if not already present
 if ! command -v node >/dev/null 2>&1; then
@@ -48,11 +33,6 @@ else
 fi
 
 # Install frontend dependencies
-cd "$TARGET_DIR" || {
-  echo "❌ Cannot access target directory: $TARGET_DIR"
-  exit 1
-}
-
 if [ -d "frontend" ]; then
   cd frontend
   echo "⚙️ Setting up frontend..."

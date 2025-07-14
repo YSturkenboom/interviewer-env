@@ -196,18 +196,20 @@ if [ -z "$INSTANCE_ID" ] || [ -z "$PUBLIC_IP" ]; then
   exit 1
 fi
 
-# Lookup session domain in Route 53 using AWS CLI
-# Replace <YOUR_HOSTED_ZONE_ID> with your actual hosted zone ID
-HOSTED_ZONE_ID="<YOUR_HOSTED_ZONE_ID>"  # TODO: Set your hosted zone ID here
-SESSION_DOMAIN=$(aws route53 list-resource-record-sets \
-  --hosted-zone-id "$HOSTED_ZONE_ID" \
-  --query "ResourceRecordSets[?ResourceRecords[?Value=='$PUBLIC_IP'] && starts_with(Name, 'session-')].Name" \
-  --output text | head -n1 | sed 's/\.$//')
+# Read SUBDOMAIN from instance-info.txt if available
+if [ -f /home/ubuntu/instance-info.txt ]; then
+  source /home/ubuntu/instance-info.txt
+fi
 
-SESSION_URL="http://${SESSION_DOMAIN}:8080"
+# Fallback if SUBDOMAIN is not set
+if [ -z "$SUBDOMAIN" ]; then
+  echo "❌ SUBDOMAIN not found in /home/ubuntu/instance-info.txt"
+  exit 1
+fi
+
+SESSION_URL="https://${SUBDOMAIN}"
 
 # Send webhook
-echo "📡 Sending webhook... $WEBHOOK_URL"
 curl -s -X POST "$WEBHOOK_URL" \
   -H "Content-Type: application/json" \
   -d "{\"instance_id\":\"$INSTANCE_ID\",\"public_ip\":\"$PUBLIC_IP\",\"session_url\":\"$SESSION_URL\",\"status\":\"ready\"}" \

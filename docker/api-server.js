@@ -1,11 +1,11 @@
 // docker/api-server.js
-const express = require('express');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const archiver = require('archiver');
-const fs = require('fs');
-const path = require('path');
-const { spawn } = require('child_process');
-const { PassThrough } = require('stream');
+const express = require("express");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const archiver = require("archiver");
+const fs = require("fs");
+const path = require("path");
+const { spawn } = require("child_process");
+const { PassThrough } = require("stream");
 const app = express();
 const PORT = 9000;
 
@@ -115,9 +115,12 @@ app.post("/api/save-workspace", async (req, res) => {
 
     const result = await s3Client.send(new PutObjectCommand(uploadParams));
     try {
-      await streamMongoDumpToS3(bucket, `interviews/${interviewTakenId}/mongo-dump-${timestamp}.gz`);
+      await streamMongoDumpToS3(
+        bucket,
+        `interviews/${interviewTakenId}/mongo-dump-${timestamp}.gz`
+      );
     } catch (e) {
-      console.error('❌ Error saving workspace:', e);
+      console.error("❌ Error saving workspace:", e);
     }
     // Cleanup temp file
     fs.unlinkSync(zipPath);
@@ -218,13 +221,10 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-export async function streamMongoDumpToS3(bucket, key) {
-  const args = [
-    '--archive',
-    '--gzip'
-  ]
+async function streamMongoDumpToS3(bucket, key) {
+  const args = ["--archive", "--gzip"];
   // if (dbName) args.push(`--db=${dbName}`)
-  const dump = spawn('mongodump', args);
+  const dump = spawn("mongodump", args);
 
   const uploadStream = new PassThrough();
 
@@ -237,17 +237,17 @@ export async function streamMongoDumpToS3(bucket, key) {
       Bucket: bucket,
       Key: key,
       Body: uploadStream,
-      ContentType: 'application/gzip',
+      ContentType: "application/gzip",
     })
   );
 
-  dump.stderr.on('data', (data) => {
+  dump.stderr.on("data", (data) => {
     console.error(`[mongodump] ${data.toString()}`);
   });
 
   return new Promise((resolve, reject) => {
-    dump.on('error', reject);
-    dump.on('close', async (code) => {
+    dump.on("error", reject);
+    dump.on("close", async (code) => {
       if (code === 0) {
         await uploadPromise;
         console.log(`✅ Mongo dump uploaded to S3: ${key}`);
@@ -258,3 +258,5 @@ export async function streamMongoDumpToS3(bucket, key) {
     });
   });
 }
+
+module.exports = { streamMongoDumpToS3 };

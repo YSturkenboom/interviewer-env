@@ -36,6 +36,8 @@ services:
     image: mongo:6.0
     container_name: interview-mongo
     environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
       MONGO_INITDB_DATABASE: testdb
     volumes:
       - mongo_data:/data/db

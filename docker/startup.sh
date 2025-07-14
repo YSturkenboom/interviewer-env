@@ -6,10 +6,6 @@ set -uo pipefail
 echo "🟢 Interview environment setup started at $(date)"
 
 TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
-
-# Clone the challenge repo
-echo "📥 Cloning challenge repo: $REPO_URL to $TARGET_DIR"
-git clone "$REPO_URL" "$TARGET_DIR" 
   
 # Create a simple default setup
 cat > "$TARGET_DIR/README.md" << 'EOF'

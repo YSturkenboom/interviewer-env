@@ -94,10 +94,6 @@ if ! curl -s http://localhost:9000/health > /dev/null 2>&1; then
   fi
 fi
 
-# Fix ownership of the user data directory
-USER_DATA_DIR="/home/ubuntu/interviewer-env/.vscode-user-data"
-sudo chown -R coder:coder "$USER_DATA_DIR"
-
 # 📦 Install the diff tracker extension
 echo "🚀 Installing diff tracker extension..."
 /usr/bin/code-server --install-extension /tmp/my-extension.vsix
@@ -106,12 +102,12 @@ echo "🚀 Installing diff tracker extension..."
 echo "🚀 Installing MongoDB extension..."
 /usr/bin/code-server --install-extension mongodb.mongodb-vscode
 
-
 # 🔗 Create MongoDB connections file
-
+USER_DATA_DIR="/home/ubuntu/interviewer-env/.vscode-user-data"
 sudo mkdir -p "$USER_DATA_DIR/User"
 
-
+# Fix ownership AFTER creating the directory
+sudo chown -R coder:coder "$USER_DATA_DIR"
 
 sudo tee "$USER_DATA_DIR/User/settings.json" > /dev/null << EOF
 {

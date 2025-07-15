@@ -1,360 +1,439 @@
-// MongoDB initialization script for interview environment
+// MongoDB initialization script for pizza store environment
 // This script runs automatically when MongoDB container starts for the first time
 
-// Switch to the interview database
+// Switch to the pizza store database
 db = db.getSiblingDB("testdb");
 
-// Create Users collection with sample data
+// Create Users collection with admin and user accounts
+// Password "test1234" hashed using bcrypt with salt rounds 10
 db.users.insertMany([
   {
     _id: ObjectId(),
-    name: "John Doe",
-    email: "john@example.com",
-    age: 30,
-    role: "senior_developer",
-    skills: ["JavaScript", "Python", "MongoDB", "React", "Node.js"],
-    salary: 95000,
-    department: "Engineering",
-    joinDate: new Date("2022-03-15"),
-    isActive: true,
-    address: {
-      street: "123 Tech St",
-      city: "San Francisco",
-      state: "CA",
-      zipCode: "94102",
-    },
+    email: "admin@example.com",
+    password: "$2b$10$K8BEQNhKU4WkW5pDGj5K8eHXqFAR9dT3JxY9vCjWsN.tLqE2Fz3wO", // test1234
+    role: "admin",
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     _id: ObjectId(),
-    name: "Jane Smith",
-    email: "jane@example.com",
-    age: 28,
-    role: "product_designer",
-    skills: ["Figma", "Sketch", "UI/UX", "Prototyping", "User Research"],
-    salary: 85000,
-    department: "Design",
-    joinDate: new Date("2023-01-10"),
-    isActive: true,
-    address: {
-      street: "456 Design Ave",
-      city: "Los Angeles",
-      state: "CA",
-      zipCode: "90210",
-    },
-  },
-  {
-    _id: ObjectId(),
-    name: "Bob Wilson",
-    email: "bob@example.com",
-    age: 35,
-    role: "engineering_manager",
-    skills: ["Leadership", "Agile", "Strategy", "Team Management"],
-    salary: 120000,
-    department: "Engineering",
-    joinDate: new Date("2021-08-20"),
-    isActive: false,
-    address: {
-      street: "789 Management Blvd",
-      city: "Seattle",
-      state: "WA",
-      zipCode: "98101",
-    },
-  },
-  {
-    _id: ObjectId(),
-    name: "Alice Johnson",
-    email: "alice@example.com",
-    age: 26,
-    role: "junior_developer",
-    skills: ["JavaScript", "HTML", "CSS", "React"],
-    salary: 65000,
-    department: "Engineering",
-    joinDate: new Date("2023-06-01"),
-    isActive: true,
-    address: {
-      street: "321 Code Lane",
-      city: "Austin",
-      state: "TX",
-      zipCode: "73301",
-    },
-  },
+    email: "user@example.com", 
+    password: "$2b$10$K8BEQNhKU4WkW5pDGj5K8eHXqFAR9dT3JxY9vCjWsN.tLqE2Fz3wO", // test1234
+    role: "user",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
 ]);
 
-// Create Products collection for e-commerce scenarios
-db.products.insertMany([
+// Create Pizzas collection with 50 different pizzas
+db.pizzas.insertMany([
   {
     _id: ObjectId(),
-    name: "MacBook Pro 16-inch",
-    price: 2499.99,
-    category: "electronics",
-    brand: "Apple",
-    inStock: true,
-    quantity: 25,
-    tags: ["laptop", "computer", "apple", "professional"],
-    specifications: {
-      screen: "16-inch Liquid Retina XDR",
-      processor: "M2 Pro",
-      memory: "16GB",
-      storage: "512GB SSD",
-      graphics: "19-core GPU",
-      ports: ["Thunderbolt 4", "HDMI", "MagSafe 3"],
-    },
-    rating: 4.8,
-    reviews: 127,
-    createdAt: new Date("2023-01-15"),
-    updatedAt: new Date("2024-01-10"),
+    name: "Margherita Classic",
+    price: 118,
+    ingredients: ["Cheese", "Tomato", "Crust"],
+    veg: true,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
   },
   {
     _id: ObjectId(),
-    name: "Wireless Magic Mouse",
-    price: 79.99,
-    category: "accessories",
-    brand: "Apple",
-    inStock: true,
-    quantity: 150,
-    tags: ["mouse", "wireless", "computer", "bluetooth"],
-    specifications: {
-      connectivity: "Bluetooth",
-      battery: "Built-in rechargeable",
-      compatibility: ["Mac", "iPad"],
-      color: "White",
-    },
-    rating: 4.3,
-    reviews: 89,
-    createdAt: new Date("2023-02-01"),
-    updatedAt: new Date("2024-01-05"),
+    name: "Margherita 727",
+    price: 118,
+    ingredients: ["Cheese", "Tomato", "Crust"],
+    veg: false,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
   },
   {
     _id: ObjectId(),
-    name: "Premium Coffee Maker",
-    price: 299.99,
-    category: "kitchen",
-    brand: "Breville",
-    inStock: false,
-    quantity: 0,
-    tags: ["coffee", "kitchen", "appliance", "premium"],
-    specifications: {
-      capacity: "12 cups",
-      features: ["programmable", "auto-shutoff", "thermal carafe"],
-      warranty: "2 years",
-      dimensions: "14.2 x 8.5 x 16.25 inches",
-    },
-    rating: 4.6,
-    reviews: 203,
-    createdAt: new Date("2023-03-10"),
-    updatedAt: new Date("2023-12-20"),
+    name: "Pepperoni Supreme",
+    price: 145,
+    ingredients: ["Cheese", "Tomato", "Crust", "Pepperoni"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
   },
   {
     _id: ObjectId(),
-    name: "Smartphone Pro Max",
-    price: 1099.99,
-    category: "electronics",
-    brand: "TechCorp",
-    inStock: true,
-    quantity: 45,
-    tags: ["phone", "smartphone", "mobile", "5G"],
-    specifications: {
-      screen: "6.7-inch OLED",
-      processor: "A16 Bionic",
-      memory: "256GB",
-      camera: "48MP Triple camera",
-      battery: "4000mAh",
-      connectivity: ["5G", "WiFi 6", "Bluetooth 5.3"],
-    },
-    rating: 4.7,
-    reviews: 156,
-    createdAt: new Date("2023-04-05"),
-    updatedAt: new Date("2024-01-08"),
+    name: "Veggie Delight",
+    price: 132,
+    ingredients: ["Cheese", "Tomato", "Crust", "Bell Peppers", "Mushrooms", "Onions"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
   },
+  {
+    _id: ObjectId(),
+    name: "Hawaiian Paradise",
+    price: 158,
+    ingredients: ["Cheese", "Tomato", "Crust", "Ham", "Pineapple"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "BBQ Chicken",
+    price: 175,
+    ingredients: ["Cheese", "BBQ Sauce", "Crust", "Chicken", "Onions"],
+    veg: false,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Meat Lovers",
+    price: 195,
+    ingredients: ["Cheese", "Tomato", "Crust", "Pepperoni", "Sausage", "Ham", "Bacon"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Mediterranean",
+    price: 168,
+    ingredients: ["Cheese", "Tomato", "Crust", "Olives", "Feta", "Spinach"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Buffalo Chicken",
+    price: 182,
+    ingredients: ["Cheese", "Buffalo Sauce", "Crust", "Chicken", "Celery"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Four Cheese",
+    price: 155,
+    ingredients: ["Mozzarella", "Cheddar", "Parmesan", "Gouda", "Crust"],
+    veg: true,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Spicy Italian",
+    price: 172,
+    ingredients: ["Cheese", "Tomato", "Crust", "Salami", "Pepperoni", "Jalapeños"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Garden Fresh",
+    price: 142,
+    ingredients: ["Cheese", "Tomato", "Crust", "Tomatoes", "Basil", "Arugula"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Mushroom Truffle",
+    price: 189,
+    ingredients: ["Cheese", "White Sauce", "Crust", "Mushrooms", "Truffle Oil"],
+    veg: true,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Seafood Special",
+    price: 215,
+    ingredients: ["Cheese", "Tomato", "Crust", "Shrimp", "Calamari", "Garlic"],
+    veg: false,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Prosciutto Fig",
+    price: 198,
+    ingredients: ["Cheese", "White Sauce", "Crust", "Prosciutto", "Figs", "Arugula"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Veggie Supreme",
+    price: 162,
+    ingredients: ["Cheese", "Tomato", "Crust", "Bell Peppers", "Mushrooms", "Onions", "Olives"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Chicken Alfredo",
+    price: 178,
+    ingredients: ["Cheese", "Alfredo Sauce", "Crust", "Chicken", "Spinach"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Taco Pizza",
+    price: 165,
+    ingredients: ["Cheese", "Salsa", "Crust", "Ground Beef", "Lettuce", "Tomatoes"],
+    veg: false,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Pesto Chicken",
+    price: 185,
+    ingredients: ["Cheese", "Pesto Sauce", "Crust", "Chicken", "Sun-dried Tomatoes"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "White Pizza",
+    price: 148,
+    ingredients: ["Ricotta", "Mozzarella", "Crust", "Garlic", "Herbs"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Sausage & Peppers",
+    price: 159,
+    ingredients: ["Cheese", "Tomato", "Crust", "Italian Sausage", "Bell Peppers"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Spinach Artichoke",
+    price: 155,
+    ingredients: ["Cheese", "White Sauce", "Crust", "Spinach", "Artichokes"],
+    veg: true,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Bacon Ranch",
+    price: 172,
+    ingredients: ["Cheese", "Ranch Dressing", "Crust", "Bacon", "Chicken"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Greek Style",
+    price: 168,
+    ingredients: ["Cheese", "Tomato", "Crust", "Feta", "Olives", "Onions"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Philly Cheesesteak",
+    price: 189,
+    ingredients: ["Cheese", "White Sauce", "Crust", "Steak", "Peppers", "Onions"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Caprese",
+    price: 152,
+    ingredients: ["Mozzarella", "Tomato", "Crust", "Fresh Basil", "Balsamic"],
+    veg: true,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Breakfast Pizza",
+    price: 175,
+    ingredients: ["Cheese", "White Sauce", "Crust", "Eggs", "Bacon", "Sausage"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Thai Chicken",
+    price: 192,
+    ingredients: ["Cheese", "Peanut Sauce", "Crust", "Chicken", "Bean Sprouts"],
+    veg: false,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Pulled Pork",
+    price: 182,
+    ingredients: ["Cheese", "BBQ Sauce", "Crust", "Pulled Pork", "Coleslaw"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Goat Cheese & Honey",
+    price: 165,
+    ingredients: ["Goat Cheese", "Honey", "Crust", "Walnuts", "Arugula"],
+    veg: true,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Chicken Parmesan",
+    price: 178,
+    ingredients: ["Cheese", "Tomato", "Crust", "Breaded Chicken", "Parmesan"],
+    veg: false,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Eggplant Parmesan",
+    price: 162,
+    ingredients: ["Cheese", "Tomato", "Crust", "Eggplant", "Parmesan"],
+    veg: true,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Salmon & Dill",
+    price: 225,
+    ingredients: ["Cream Cheese", "Dill", "Crust", "Smoked Salmon", "Capers"],
+    veg: false,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Duck Confit",
+    price: 235,
+    ingredients: ["Cheese", "Orange Sauce", "Crust", "Duck Confit", "Cranberries"],
+    veg: false,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Ratatouille",
+    price: 148,
+    ingredients: ["Cheese", "Tomato", "Crust", "Zucchini", "Eggplant", "Peppers"],
+    veg: true,
+    available: true,
+    image: "pizza3.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Chorizo & Manchego",
+    price: 195,
+    ingredients: ["Manchego", "Tomato", "Crust", "Chorizo", "Roasted Peppers"],
+    veg: false,
+    available: true,
+    image: "pizza4.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Vegan Deluxe",
+    price: 155,
+    ingredients: ["Vegan Cheese", "Tomato", "Crust", "Mushrooms", "Peppers", "Onions"],
+    veg: true,
+    available: true,
+    image: "pizza1.jpeg",
+    __v: 0
+  },
+  {
+    _id: ObjectId(),
+    name: "Lamb & Rosemary",
+    price: 215,
+    ingredients: ["Cheese", "Tomato", "Crust", "Lamb
 ]);
 
-// Create Orders collection for transaction scenarios
-db.orders.insertMany([
-  {
-    _id: ObjectId(),
-    orderNumber: "ORD-2024-001",
-    userId: ObjectId(),
-    customerEmail: "john@example.com",
-    items: [
-      {
-        productId: ObjectId(),
-        productName: "MacBook Pro 16-inch",
-        quantity: 1,
-        unitPrice: 2499.99,
-        totalPrice: 2499.99,
-      },
-    ],
-    subtotal: 2499.99,
-    tax: 224.99,
-    shipping: 0.0,
-    totalAmount: 2724.98,
-    status: "completed",
-    paymentMethod: "credit_card",
-    orderDate: new Date("2024-01-15"),
-    shippedDate: new Date("2024-01-17"),
-    deliveredDate: new Date("2024-01-20"),
-    shippingAddress: {
-      name: "John Doe",
-      street: "123 Tech St",
-      city: "San Francisco",
-      state: "CA",
-      zipCode: "94102",
-      country: "USA",
-    },
-    trackingNumber: "1Z999AA1234567890",
-  },
-  {
-    _id: ObjectId(),
-    orderNumber: "ORD-2024-002",
-    userId: ObjectId(),
-    customerEmail: "jane@example.com",
-    items: [
-      {
-        productId: ObjectId(),
-        productName: "Wireless Magic Mouse",
-        quantity: 2,
-        unitPrice: 79.99,
-        totalPrice: 159.98,
-      },
-      {
-        productId: ObjectId(),
-        productName: "Smartphone Pro Max",
-        quantity: 1,
-        unitPrice: 1099.99,
-        totalPrice: 1099.99,
-      },
-    ],
-    subtotal: 1259.97,
-    tax: 113.4,
-    shipping: 15.0,
-    totalAmount: 1388.37,
-    status: "processing",
-    paymentMethod: "paypal",
-    orderDate: new Date("2024-01-18"),
-    shippingAddress: {
-      name: "Jane Smith",
-      street: "456 Design Ave",
-      city: "Los Angeles",
-      state: "CA",
-      zipCode: "90210",
-      country: "USA",
-    },
-  },
-  {
-    _id: ObjectId(),
-    orderNumber: "ORD-2024-003",
-    userId: ObjectId(),
-    customerEmail: "alice@example.com",
-    items: [
-      {
-        productId: ObjectId(),
-        productName: "Premium Coffee Maker",
-        quantity: 1,
-        unitPrice: 299.99,
-        totalPrice: 299.99,
-      },
-    ],
-    subtotal: 299.99,
-    tax: 27.0,
-    shipping: 12.99,
-    totalAmount: 339.98,
-    status: "cancelled",
-    paymentMethod: "credit_card",
-    orderDate: new Date("2024-01-12"),
-    cancelledDate: new Date("2024-01-13"),
-    cancelReason: "Out of stock",
-    shippingAddress: {
-      name: "Alice Johnson",
-      street: "321 Code Lane",
-      city: "Austin",
-      state: "TX",
-      zipCode: "73301",
-      country: "USA",
-    },
-  },
-]);
+// Create empty Orders collection (structure defined but no data)
+// This collection will be populated when orders are placed
+db.createCollection("orders");
 
-// Create Categories collection for product organization
-db.categories.insertMany([
-  {
-    _id: ObjectId(),
-    name: "Electronics",
-    slug: "electronics",
-    description: "Latest electronic devices and gadgets",
-    parentId: null,
-    isActive: true,
-    createdAt: new Date("2023-01-01"),
-  },
-  {
-    _id: ObjectId(),
-    name: "Computers",
-    slug: "computers",
-    description: "Laptops, desktops, and computer accessories",
-    parentId: ObjectId(), // Would reference Electronics category
-    isActive: true,
-    createdAt: new Date("2023-01-01"),
-  },
-  {
-    _id: ObjectId(),
-    name: "Kitchen",
-    slug: "kitchen",
-    description: "Kitchen appliances and accessories",
-    parentId: null,
-    isActive: true,
-    createdAt: new Date("2023-01-01"),
-  },
-  {
-    _id: ObjectId(),
-    name: "Accessories",
-    slug: "accessories",
-    description: "Various accessories and add-ons",
-    parentId: null,
-    isActive: true,
-    createdAt: new Date("2023-01-01"),
-  },
-]);
-create;
+// Create indexes for performance optimization
 
-// Create comprehensive indexes for performance
 // Users collection indexes
 db.users.createIndex({ email: 1 }, { unique: true });
 db.users.createIndex({ role: 1 });
-db.users.createIndex({ department: 1 });
-db.users.createIndex({ isActive: 1 });
-db.users.createIndex({ joinDate: -1 });
-db.users.createIndex({ salary: 1 });
 
-// Products collection indexes
-db.products.createIndex({ category: 1 });
-db.products.createIndex({ brand: 1 });
-db.products.createIndex({ inStock: 1 });
-db.products.createIndex({ price: 1 });
-db.products.createIndex({ name: "text", tags: "text" }); // Text search
-db.products.createIndex({ rating: -1 });
-db.products.createIndex({ createdAt: -1 });
+// Pizzas collection indexes
+db.pizzas.createIndex({ name: 1 });
+db.pizzas.createIndex({ available: 1 });
+db.pizzas.createIndex({ veg: 1 });
+db.pizzas.createIndex({ price: 1 });
+db.pizzas.createIndex({ name: "text", ingredients: "text" }); // Text search
 
-// Orders collection indexes
+// Orders collection indexes (for future use)
 db.orders.createIndex({ userId: 1 });
-db.orders.createIndex({ customerEmail: 1 });
 db.orders.createIndex({ orderDate: -1 });
 db.orders.createIndex({ status: 1 });
 db.orders.createIndex({ orderNumber: 1 }, { unique: true });
-db.orders.createIndex({ totalAmount: 1 });
 
-// Categories collection indexes
-db.categories.createIndex({ slug: 1 }, { unique: true });
-db.categories.createIndex({ parentId: 1 });
-db.categories.createIndex({ isActive: 1 });
+// Compound indexes for common query patterns
+db.pizzas.createIndex({ available: 1, veg: 1, price: 1 });
 
-// Create compound indexes for common query patterns
-db.products.createIndex({ category: 1, inStock: 1, price: 1 });
-db.orders.createIndex({ status: 1, orderDate: -1 });
-db.users.createIndex({ department: 1, isActive: 1 });
-
-// Create user for the interview database with readWrite access to only the interview database
+// Create user for the pizza store database with readWrite access
 db.createUser({
-  user: "candidate",
-  pwd: "candidatepass",
+  user: "pizzauser",
+  pwd: "pizzapass",
   roles: [
     {
       role: "readWrite",
@@ -363,12 +442,16 @@ db.createUser({
   ],
 });
 
-print("✅ Interview database initialized successfully!");
-print("📊 Collections created: users, products, orders, categories");
+print("🍕 Pizza store database initialized successfully!");
+print("📊 Collections created: users, pizzas, orders");
 print("📈 Sample data inserted:");
 print("   - Users: " + db.users.countDocuments());
-print("   - Products: " + db.products.countDocuments());
+print("   - Pizzas: " + db.pizzas.countDocuments());
 print("   - Orders: " + db.orders.countDocuments());
-print("   - Categories: " + db.categories.countDocuments());
 print("🔍 Indexes created for optimized queries");
-print("🚀 Ready for interview coding challenges!");
+print("🚀 Ready for pizza store operations!");
+print("");
+print("👤 User credentials:");
+print("   Admin: admin@example.com / test1234");
+print("   User: user@example.com / test1234");
+print("   DB User: pizzauser / pizzapass");

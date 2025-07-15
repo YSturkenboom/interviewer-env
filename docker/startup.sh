@@ -94,6 +94,10 @@ if ! curl -s http://localhost:9000/health > /dev/null 2>&1; then
   fi
 fi
 
+# Fix permissions
+echo "🔒 Fixing workspace permissions..."
+sudo chown -R coder:coder /home/ubuntu/interviewer-env
+
 # 📦 Install the diff tracker extension
 echo "🚀 Installing diff tracker extension..."
 /usr/bin/code-server --install-extension /tmp/my-extension.vsix
@@ -276,10 +280,6 @@ cleanup() {
   
   exit 0
 }
-
-# Fix permissions
-echo "🔒 Fixing workspace permissions..."
-sudo chown -R coder:coder /home/ubuntu/interviewer-env/workspace
 
 # Set up signal handlers
 trap cleanup SIGTERM SIGINT

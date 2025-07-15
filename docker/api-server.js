@@ -9,16 +9,6 @@ const { PassThrough } = require("stream");
 const app = express();
 const PORT = 9000;
 
-console.log(process.env.PASSWORD);
-console.log(process.env.INTERVIEW_TAKEN_ID);
-console.log(process.env.AWS_ACCESS_KEY_ID);
-console.log(process.env.AWS_BUCKET);
-console.log(process.env.AWS_SECRET_ACCESS_KEY);
-console.log(process.env.AWS_REGION);
-console.log(process.env.REPO_NAME);
-console.log(process.env.REPO_URL);
-console.log(process.env.MONGO_URI);
-
 // Initialize S3 client
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,

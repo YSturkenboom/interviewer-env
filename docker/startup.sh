@@ -98,9 +98,25 @@ fi
 echo "🚀 Installing diff tracker extension..."
 /usr/bin/code-server --install-extension /tmp/my-extension.vsix
 
-# 📦 Install MongoDB extension
-echo "🚀 Installing MongoDB extension..."
+# 📦 a) Install MongoDB extension
+echo "🚀 Installing MongoDB extension... (1/2)"
 /usr/bin/code-server --install-extension mongodb.mongodb-vscode
+
+# b) Create MongoDB connections file
+echo "🔗 Creating MongoDB connections file... (2/2)"
+cd "$TARGET_DIR"
+sudo mkdir -p .vscode
+sudo tee .vscode/mongodb.connections.json > /dev/null << EOF
+{
+  "connections": [
+    {
+      "name": "Mongo Interview DB",
+      "connectionString": "mongodb://candidate:candidatepass@mongo-db:27017/testdb?authSource=testdb"
+    }
+  ]
+}
+EOF
+cd /home/coder
 
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
@@ -183,6 +199,8 @@ WEBHOOK_PAYLOAD=$(cat <<EOF
   "session_url": "$SESSION_URL",
   "subdomain": "$SUBDOMAIN",
   "interview_taken_id": "$INTERVIEW_TAKEN_ID",
+  "challenge_repo": "$CHALLENGE_REPO",
+  "workspace_path": "$TARGET_DIR",
   "status": "ready",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)"
 }

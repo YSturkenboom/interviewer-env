@@ -277,6 +277,10 @@ cleanup() {
   exit 0
 }
 
+# Fix permissions
+echo "🔒 Fixing workspace permissions..."
+sudo chown -R coder:coder /home/ubuntu/interviewer-env/workspace
+
 # Set up signal handlers
 trap cleanup SIGTERM SIGINT
 

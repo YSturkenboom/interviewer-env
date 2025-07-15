@@ -21,7 +21,7 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
 
     volumes:
-      - ./workspace:/home/ubuntu/interviewer-env
+      - ./workspace:/home/ubuntu/interviewer-env/workspace
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port

@@ -35,9 +35,8 @@ COPY docker/startup.sh /usr/local/bin/startup.sh
 # Make scripts executable
 RUN chmod +x /usr/local/bin/startup.sh
 
-# Create workspace directory with proper permissions
-RUN mkdir -p /home/ubuntu/interviewer-env/workspace \
-    && chown -R coder:coder /home/ubuntu/interviewer-env
+# Give proper permissions to workspace directory
+RUN chown -R coder:coder /home/ubuntu/interviewer-env
 
 # Set proper ownership
 RUN chown -R coder:coder /home/coder/

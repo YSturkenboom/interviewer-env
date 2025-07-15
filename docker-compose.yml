@@ -1,3 +1,7 @@
+networks:
+  interview-net:
+    driver: bridge
+
 services:
   code-server:
     build:
@@ -17,7 +21,7 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
 
     volumes:
-      - ./workspace:/home/ubuntu/interviewer-env
+      - ./workspace:/home/ubuntu/interviewer-env/workspace
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port
@@ -25,17 +29,23 @@ services:
       - "9000:9000" # API server port for workspace operations
     depends_on:
       - mongo-db
+    networks:
+      - interview-net
 
   mongo-db:
     image: mongo:6.0
     container_name: interview-mongo
     environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
       MONGO_INITDB_DATABASE: testdb
     volumes:
       - mongo_data:/data/db
       - ./mongo-init:/docker-entrypoint-initdb.d # This mounts your init scripts
     ports:
       - "27017:27017"
+    networks:
+      - interview-net
 
 volumes:
   mongo_data:

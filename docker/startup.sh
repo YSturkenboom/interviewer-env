@@ -35,7 +35,7 @@ fi
 # Install frontend dependencies
 if [ -d "frontend" ]; then
   cd frontend
-  echo "⚙️ Setting up frontend..."
+  echo "⚙ Setting up frontend..."
   sudo tee .env > /dev/null << EOF
 REACT_APP_API_URL=http://localhost:5000/api
 EOF
@@ -46,7 +46,7 @@ fi
 # Install backend dependencies
 if [ -d "backend" ]; then
   cd backend
-  echo "⚙️ Setting up backend..."
+  echo "⚙ Setting up backend..."
   sudo tee .env > /dev/null << EOF
 MONGO_URI=mongodb+srv://admininterview:test123@devcluster.gifvk5p.mongodb.net/pizza-shop?retryWrites=true&w=majority&appName=DevCluster
 PORT=5000
@@ -57,7 +57,7 @@ EOF
 fi
 
 # 🚀 Start API server in background (from correct directory)
-echo "🛠️ Starting API Server..."
+echo "🛠 Starting API Server..."
 cd /home/coder && node api-server.js &
 API_SERVER_PID=$!
 
@@ -68,7 +68,7 @@ for i in {1..15}; do
     echo "✅ API Server is up!"
     break
   else
-    echo "⏱️ Waiting for API server... ($i)"
+    echo "⏱ Waiting for API server... ($i)"
     sleep 2
   fi
 done
@@ -98,9 +98,33 @@ fi
 echo "🚀 Installing diff tracker extension..."
 /usr/bin/code-server --install-extension /tmp/my-extension.vsix
 
-# 📦 Install MongoDB extension
+# 📦 a) Install MongoDB extension
 echo "🚀 Installing MongoDB extension..."
 /usr/bin/code-server --install-extension mongodb.mongodb-vscode
+
+# 🔗 Create MongoDB connections file
+USER_DATA_DIR="/home/ubuntu/interviewer-env/.vscode-user-data"
+sudo mkdir -p "$USER_DATA_DIR/User"
+
+sudo tee "$USER_DATA_DIR/User/settings.json" > /dev/null << EOF
+{
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "files.autoSave": "onFocusChange",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "workbench.colorTheme": "Monokai",
+  "prettier.singleQuote": true,
+  "prettier.semi": false,
+
+  // MongoDB extension config
+  "mongodb.connectionStrings": {
+    "Interview Cluster": {
+      "connectionString": "mongodb+srv://admininterview:test123@devcluster.gifvk5p.mongodb.net/",
+      "name": "Pizza Shop Interview DB"
+    }
+  }
+}
+EOF
 
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
@@ -109,7 +133,11 @@ echo "📂 Opening workspace: $TARGET_DIR"
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$TARGET_DIR" &
+  --user-data-dir "$USER_DATA_DIR" \
+  "$TARGET_DIR" \
+  "$TARGET_DIR/README.md" \
+  "$TARGET_DIR/frontend/src/App.js" &
+
 
 CODE_SERVER_PID=$!
 
@@ -120,7 +148,7 @@ for i in {1..30}; do
     echo "✅ Code Server is up!"
     break
   else
-    echo "⏱️ Waiting... ($i)"
+    echo "⏱ Waiting... ($i)"
     sleep 2
   fi
 done
@@ -183,6 +211,8 @@ WEBHOOK_PAYLOAD=$(cat <<EOF
   "session_url": "$SESSION_URL",
   "subdomain": "$SUBDOMAIN",
   "interview_taken_id": "$INTERVIEW_TAKEN_ID",
+  "challenge_repo": "$CHALLENGE_REPO",
+  "workspace_path": "$TARGET_DIR",
   "status": "ready",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)"
 }
@@ -212,7 +242,7 @@ for i in {1..3}; do
     echo "❌ Webhook failed (HTTP $HTTP_STATUS)"
     echo "📋 Response: $RESPONSE_BODY"
     if [ $i -lt 3 ]; then
-      echo "⏱️ Retrying in 5 seconds..."
+      echo "⏱ Retrying in 5 seconds..."
       sleep 5
     fi
   fi
@@ -255,7 +285,7 @@ echo "========================================"
 echo "🎉 Setup completed!"
 echo "📂 Workspace: $TARGET_DIR"
 echo "🔗 Code Server: http://localhost:8080"
-echo "🛠️ API Server: http://localhost:9000"
+echo "🛠 API Server: http://localhost:9000"
 echo "🌐 Session URL: $SESSION_URL"
 echo "========================================"
 

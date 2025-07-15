@@ -109,7 +109,7 @@ echo "📂 Opening workspace: $TARGET_DIR"
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  "$TARGET_DIR" &
+  "$TARGET_DIR/README.md" &
 
 CODE_SERVER_PID=$!
 

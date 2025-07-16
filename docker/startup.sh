@@ -112,7 +112,6 @@ echo "📂 Opening workspace: $TARGET_DIR"
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  --base-path /ide \
   "$TARGET_DIR" &
 
 CODE_SERVER_PID=$!

@@ -4,8 +4,7 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
-const { spawn } = require("child_process");
-const { PassThrough } = require("stream");
+const { exec } = require("child_process");
 const app = express();
 const PORT = 9000;
 

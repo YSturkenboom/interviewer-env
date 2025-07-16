@@ -13,16 +13,16 @@ db.users.insertMany([
     password: "$2b$10$K8BEQNhKU4WkW5pDGj5K8eHXqFAR9dT3JxY9vCjWsN.tLqE2Fz3wO", // test1234
     role: "admin",
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   },
   {
     _id: ObjectId(),
-    email: "user@example.com", 
+    email: "user@example.com",
     password: "$2b$10$K8BEQNhKU4WkW5pDGj5K8eHXqFAR9dT3JxY9vCjWsN.tLqE2Fz3wO", // test1234
     role: "user",
     createdAt: new Date(),
-    updatedAt: new Date()
-  }
+    updatedAt: new Date(),
+  },
 ]);
 
 // Create Pizzas collection with 50 different pizzas
@@ -35,7 +35,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -45,7 +45,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -55,17 +55,24 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Veggie Delight",
     price: 132,
-    ingredients: ["Cheese", "Tomato", "Crust", "Bell Peppers", "Mushrooms", "Onions"],
+    ingredients: [
+      "Cheese",
+      "Tomato",
+      "Crust",
+      "Bell Peppers",
+      "Mushrooms",
+      "Onions",
+    ],
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -75,7 +82,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -85,17 +92,25 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Meat Lovers",
     price: 195,
-    ingredients: ["Cheese", "Tomato", "Crust", "Pepperoni", "Sausage", "Ham", "Bacon"],
+    ingredients: [
+      "Cheese",
+      "Tomato",
+      "Crust",
+      "Pepperoni",
+      "Sausage",
+      "Ham",
+      "Bacon",
+    ],
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -105,7 +120,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -115,7 +130,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -125,17 +140,24 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Spicy Italian",
     price: 172,
-    ingredients: ["Cheese", "Tomato", "Crust", "Salami", "Pepperoni", "Jalapeños"],
+    ingredients: [
+      "Cheese",
+      "Tomato",
+      "Crust",
+      "Salami",
+      "Pepperoni",
+      "Jalapeños",
+    ],
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -145,7 +167,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -155,7 +177,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -165,27 +187,42 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Prosciutto Fig",
     price: 198,
-    ingredients: ["Cheese", "White Sauce", "Crust", "Prosciutto", "Figs", "Arugula"],
+    ingredients: [
+      "Cheese",
+      "White Sauce",
+      "Crust",
+      "Prosciutto",
+      "Figs",
+      "Arugula",
+    ],
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Veggie Supreme",
     price: 162,
-    ingredients: ["Cheese", "Tomato", "Crust", "Bell Peppers", "Mushrooms", "Onions", "Olives"],
+    ingredients: [
+      "Cheese",
+      "Tomato",
+      "Crust",
+      "Bell Peppers",
+      "Mushrooms",
+      "Onions",
+      "Olives",
+    ],
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -195,27 +232,40 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Taco Pizza",
     price: 165,
-    ingredients: ["Cheese", "Salsa", "Crust", "Ground Beef", "Lettuce", "Tomatoes"],
+    ingredients: [
+      "Cheese",
+      "Salsa",
+      "Crust",
+      "Ground Beef",
+      "Lettuce",
+      "Tomatoes",
+    ],
     veg: false,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Pesto Chicken",
     price: 185,
-    ingredients: ["Cheese", "Pesto Sauce", "Crust", "Chicken", "Sun-dried Tomatoes"],
+    ingredients: [
+      "Cheese",
+      "Pesto Sauce",
+      "Crust",
+      "Chicken",
+      "Sun-dried Tomatoes",
+    ],
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -225,17 +275,23 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Sausage & Peppers",
     price: 159,
-    ingredients: ["Cheese", "Tomato", "Crust", "Italian Sausage", "Bell Peppers"],
+    ingredients: [
+      "Cheese",
+      "Tomato",
+      "Crust",
+      "Italian Sausage",
+      "Bell Peppers",
+    ],
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -245,7 +301,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -255,7 +311,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -265,17 +321,24 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Philly Cheesesteak",
     price: 189,
-    ingredients: ["Cheese", "White Sauce", "Crust", "Steak", "Peppers", "Onions"],
+    ingredients: [
+      "Cheese",
+      "White Sauce",
+      "Crust",
+      "Steak",
+      "Peppers",
+      "Onions",
+    ],
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -285,7 +348,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -295,7 +358,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -305,7 +368,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -315,7 +378,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -325,7 +388,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -335,7 +398,7 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -345,7 +408,7 @@ db.pizzas.insertMany([
     veg: true,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -355,27 +418,40 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Duck Confit",
     price: 235,
-    ingredients: ["Cheese", "Orange Sauce", "Crust", "Duck Confit", "Cranberries"],
+    ingredients: [
+      "Cheese",
+      "Orange Sauce",
+      "Crust",
+      "Duck Confit",
+      "Cranberries",
+    ],
     veg: false,
     available: true,
     image: "pizza2.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Ratatouille",
     price: 148,
-    ingredients: ["Cheese", "Tomato", "Crust", "Zucchini", "Eggplant", "Peppers"],
+    ingredients: [
+      "Cheese",
+      "Tomato",
+      "Crust",
+      "Zucchini",
+      "Eggplant",
+      "Peppers",
+    ],
     veg: true,
     available: true,
     image: "pizza3.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
@@ -385,23 +461,35 @@ db.pizzas.insertMany([
     veg: false,
     available: true,
     image: "pizza4.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Vegan Deluxe",
     price: 155,
-    ingredients: ["Vegan Cheese", "Tomato", "Crust", "Mushrooms", "Peppers", "Onions"],
+    ingredients: [
+      "Vegan Cheese",
+      "Tomato",
+      "Crust",
+      "Mushrooms",
+      "Peppers",
+      "Onions",
+    ],
     veg: true,
     available: true,
     image: "pizza1.jpeg",
-    __v: 0
+    __v: 0,
   },
   {
     _id: ObjectId(),
     name: "Lamb & Rosemary",
     price: 215,
-    ingredients: ["Cheese", "Tomato", "Crust", "Lamb
+    ingredients: ["Cheese", "Tomato", "Crust", "Lamb"],
+    veg: false,
+    available: true,
+    image: "pizza2.jpeg",
+    __v: 0,
+  },
 ]);
 
 // Create empty Orders collection (structure defined but no data)

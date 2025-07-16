@@ -5,6 +5,11 @@ set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
+# These env variables ensure that the code-server instance starts with the correct proxy setup for a create-react-app project
+export PUBLIC_URL="/absproxy/3000"
+export WDS_SOCKET_PATH="/absproxy/3000/sockjs-node"
+export BROWSER="none"
+
 TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
   
 # Clone repo only if not already cloned
@@ -33,31 +38,6 @@ if ! command -v yarn >/dev/null 2>&1; then
   sudo corepack prepare yarn@stable --activate
 else
   echo "✅ Yarn is already installed: $(yarn -v)"
-fi
-
-# Install frontend dependencies
-if [ -d "frontend" ]; then
-  cd frontend
-  echo "⚙ Setting up frontend..."
-  sudo tee .env > /dev/null << EOF
-REACT_APP_API_URL=http://localhost:5000/api
-BASE_PATH=/absproxy/3000
-EOF
-  sudo npm install || echo "❌ Frontend install failed"
-  cd ..
-fi
-
-# Install backend dependencies
-if [ -d "backend" ]; then
-  cd backend
-  echo "⚙ Setting up backend..."
-  sudo tee .env > /dev/null << EOF
-MONGO_URI=mongodb+srv://admininterview:test123@devcluster.gifvk5p.mongodb.net/pizza-shop?retryWrites=true&w=majority&appName=DevCluster
-PORT=5000
-JWT_SECRET=secret
-EOF
-  sudo npm install || echo "❌ Backend install failed"
-  cd ..
 fi
 
 # 🚀 Start API server in background (from correct directory)

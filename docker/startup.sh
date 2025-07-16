@@ -15,6 +15,9 @@ else
   echo "✅ Repo already exists at $TARGET_DIR"
 fi
 
+# Set proper ownership
+sudo chown -R coder:coder "$TARGET_DIR"
+
 # Install Node.js, npm, and Yarn if not already present
 if ! command -v node >/dev/null 2>&1; then
   echo "📦 Installing Node.js..."

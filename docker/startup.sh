@@ -137,10 +137,7 @@ echo "📂 Opening workspace: $TARGET_DIR"
   --host 0.0.0.0 \
   --port 8080 \
   --user-data-dir "$USER_DATA_DIR" \
-  "$TARGET_DIR" \
-  "$TARGET_DIR/README.md" \
-  "$TARGET_DIR/frontend/src/App.js" &
-
+  "$TARGET_DIR" &
 
 CODE_SERVER_PID=$!
 

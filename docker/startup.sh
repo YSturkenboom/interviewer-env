@@ -9,6 +9,7 @@ echo "🟢 Interview environment setup started at $(date)"
 export PUBLIC_URL="/absproxy/3000"
 export WDS_SOCKET_PATH="/absproxy/3000/sockjs-node"
 export BROWSER="none"
+export VSCODE_PROXY_URI="/absproxy/{{port}}"
 
 TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
   

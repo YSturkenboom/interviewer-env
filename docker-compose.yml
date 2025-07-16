@@ -19,7 +19,6 @@ services:
       - REPO_URL=${REPO_URL}
       - SUBDOMAIN=${SUBDOMAIN}
       - WEBHOOK_URL=${WEBHOOK_URL}
-      - INSTANCE_ID=${INSTANCE_ID}
 
     volumes:
       - ./workspace:/home/ubuntu/interviewer-env/workspace

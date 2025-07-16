@@ -102,33 +102,6 @@ echo "🚀 Installing diff tracker extension..."
 echo "🚀 Installing MongoDB extension..."
 /usr/bin/code-server --install-extension mongodb.mongodb-vscode
 
-# 🔗 Create MongoDB connections file
-USER_DATA_DIR="/home/ubuntu/interviewer-env/.vscode-user-data"
-sudo mkdir -p "$USER_DATA_DIR/User"
-
-# Fix ownership AFTER creating the directory
-sudo chown -R coder:coder "$USER_DATA_DIR"
-
-sudo tee "$USER_DATA_DIR/User/settings.json" > /dev/null << EOF
-{
-  "editor.tabSize": 2,
-  "editor.formatOnSave": true,
-  "files.autoSave": "onFocusChange",
-  "terminal.integrated.defaultProfile.linux": "bash",
-  "workbench.colorTheme": "Monokai",
-  "prettier.singleQuote": true,
-  "prettier.semi": false,
-
-  // MongoDB extension config
-  "mongodb.connectionStrings": {
-    "Interview Cluster": {
-      "connectionString": "mongodb+srv://admininterview:test123@devcluster.gifvk5p.mongodb.net/",
-      "name": "Pizza Shop Interview DB"
-    }
-  }
-}
-EOF
-
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
 echo "📂 Opening workspace: $TARGET_DIR"
@@ -136,7 +109,6 @@ echo "📂 Opening workspace: $TARGET_DIR"
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  --user-data-dir "$USER_DATA_DIR" \
   "$TARGET_DIR" &
 
 CODE_SERVER_PID=$!

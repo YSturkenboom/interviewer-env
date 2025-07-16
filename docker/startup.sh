@@ -41,6 +41,7 @@ if [ -d "frontend" ]; then
   echo "⚙ Setting up frontend..."
   sudo tee .env > /dev/null << EOF
 REACT_APP_API_URL=http://localhost:5000/api
+BASE_PATH=/absproxy/3000
 EOF
   sudo npm install || echo "❌ Frontend install failed"
   cd ..

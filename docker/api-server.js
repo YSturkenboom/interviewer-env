@@ -212,41 +212,18 @@ process.on("SIGINT", () => {
 });
 
 async function streamMongoDumpToS3(bucket, key) {
-  const args = ["--archive", "--gzip"];
-  // if (dbName) args.push(`--db=${dbName}`)
-  const dump = spawn("mongodump", args);
+  const s3Path = `s3://${bucket}/${key}`;
 
-  const uploadStream = new PassThrough();
+  // this should match the mongo-db service name in docker-compose.yml
+  const command = `docker exec mongo-db sh -c 'mongodump --archive --gzip | aws s3 cp - ${s3Path}'`;
 
-  // Pipe mongodump output into the PassThrough stream
-  dump.stdout.pipe(uploadStream);
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error running mongodump:', stderr);
+      return res.status(500).json({ error: 'Backup failed', details: stderr });
+    }
 
-  // Pipe to S3
-  const uploadPromise = s3Client.send(
-    new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      Body: uploadStream,
-      ContentType: "application/gzip",
-    })
-  );
-
-  dump.stderr.on("data", (data) => {
-    console.error(`[mongodump] ${data.toString()}`);
-  });
-
-  return new Promise((resolve, reject) => {
-    dump.on("error", reject);
-    dump.on("close", async (code) => {
-      if (code === 0) {
-        await uploadPromise;
-        console.log(`✅ Mongo dump uploaded to S3: ${key}`);
-        resolve();
-      } else {
-        reject(new Error(`mongodump exited with code ${code}`));
-      }
-    });
+    console.log('MongoDB dump uploaded to S3:', s3Path);
+    res.status(200).json({ message: 'Backup complete', s3Path });
   });
 }
-
-module.exports = { streamMongoDumpToS3 };

@@ -11,6 +11,9 @@ export WDS_SOCKET_PATH="/absproxy/3000/sockjs-node"
 export BROWSER="none"
 export VSCODE_PROXY_URI="/absproxy/{{port}}"
 
+# Extract subdomain prefix and UUID from SUBDOMAIN
+SESSION_ID=$(echo "$SUBDOMAIN" | sed 's/\.[^.]*$//')
+
 TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
   
 # Clone repo only if not already cloned
@@ -39,7 +42,7 @@ fi
 # Set proper ownership
 sudo chown -R coder:coder "$TARGET_DIR"
 
-# Install Node.js, npm, and Yarn if not already present
+# Install Node.js
 if ! command -v node >/dev/null 2>&1; then
   echo "📦 Installing Node.js..."
   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -48,13 +51,20 @@ else
   echo "✅ Node.js is already installed: $(node -v)"
 fi
 
-if ! command -v yarn >/dev/null 2>&1; then
-  echo "📦 Installing Yarn..."
-  sudo corepack enable
-  sudo corepack prepare yarn@stable --activate
-else
-  echo "✅ Yarn is already installed: $(yarn -v)"
-fi
+# 🔗 Create the right environment variables for the projects
+echo "🔗 Creating environment variables for frontend..."
+cd $TARGET_DIR/frontend
+sudo cat > .env <<EOF
+REACT_APP_API_URL=https://${SESSION_ID}.interview-cruit.com/proxy/5000/api
+REACT_APP_BASE_PATH=/absproxy/3000
+EOF
+
+cd $TARGET_DIR/backend
+sudo cat > .env <<EOF
+MONGO_URI=mongodb://pizzauser:pizzapass@mongo-db:27017/testdb?authSource=testdb
+PORT=5000
+JWT_SECRET=secret
+EOF
 
 # 🚀 Start API server in background (from correct directory)
 echo "🛠 Starting API Server..."

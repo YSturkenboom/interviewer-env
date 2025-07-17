@@ -25,10 +25,10 @@ if [ ! -d "$TARGET_DIR" ]; then
       (
         cd "$dir"
         echo ":package: Installing dependencies..."
-        npm install
+        sudo npm install
 
         echo ":gear: Starting project in background..."
-        npm start &
+        sudo npm start &
       )
     fi
   done

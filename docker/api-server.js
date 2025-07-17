@@ -211,18 +211,20 @@ process.on("SIGINT", () => {
 });
 
 async function streamMongoDumpToS3(bucket, key) {
-  const s3Path = `s3://${bucket}/${key}`;
+  return new Promise((resolve, reject) => {
+    const s3Path = `s3://${bucket}/${key}`;
 
-  // this should match the mongo-db service name in docker-compose.yml
-  const command = `docker exec mongo-db sh -c 'mongodump --archive --gzip | aws s3 cp - ${s3Path}'`;
+    // this should match the mongo-db service name in docker-compose.yml
+    const command = `docker exec mongo-db sh -c 'mongodump --archive --gzip | aws s3 cp - ${s3Path}'`;
 
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error('Error running mongodump:', stderr);
-      return res.status(500).json({ error: 'Backup failed', details: stderr });
-    }
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error('Error running mongodump:', stderr);
+        return reject(error)
+      }
 
-    console.log('MongoDB dump uploaded to S3:', s3Path);
-    res.status(200).json({ message: 'Backup complete', s3Path });
-  });
+      console.log('MongoDB dump uploaded to S3:', s3Path);
+      resolve({ message: 'Backup complete', s3Path });
+    });
+  })
 }

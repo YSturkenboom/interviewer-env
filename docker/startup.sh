@@ -166,7 +166,7 @@ WEBHOOK_PAYLOAD=$(cat <<EOF
   "instance_id": "$INSTANCE_ID",
   "public_ip": "$PUBLIC_IP",
   "session_url": "$SESSION_URL",
-  "subdomain": "$SUBDOMAIN",
+  "subdomain": "https://${SUBDOMAIN}",
   "interview_taken_id": "$INTERVIEW_TAKEN_ID",
   "challenge_repo": "$CHALLENGE_REPO",
   "workspace_path": "$TARGET_DIR",

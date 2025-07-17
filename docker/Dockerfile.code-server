@@ -18,6 +18,15 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && node --version \
     && npm --version
 
+# Install MongoDB tools
+RUN apt-get update && \
+    apt-get install -y wget gnupg && \
+    wget -qO - https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-6.0.list && \
+    apt-get update && \
+    apt-get install -y mongodb-database-tools && \
+    apt-get clean
+
 # Copy the VS Code extension
 COPY change-extension/live-diff-uploader-0.0.1.vsix /tmp/my-extension.vsix
 
@@ -25,9 +34,9 @@ COPY change-extension/live-diff-uploader-0.0.1.vsix /tmp/my-extension.vsix
 COPY docker/api-server.js /home/coder/api-server.js
 
 # Install Node.js dependencies locally in coder home directory
-RUN cd /home/coder \
-    && npm install express archiver @aws-sdk/client-s3 \
-    && echo "Local npm packages installed"
+RUN cd /home/coder
+RUN npm install express archiver @aws-sdk/client-s3 @aws-sdk/lib-storage
+RUN echo "Local npm packages installed"
 
 # Copy startup script
 COPY docker/startup.sh /usr/local/bin/startup.sh

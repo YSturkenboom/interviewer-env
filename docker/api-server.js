@@ -1,6 +1,7 @@
 // docker/api-server.js
 const express = require("express");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage")
 const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
@@ -214,11 +215,8 @@ function streamMongoDumpToS3(bucket, key) {
   return new Promise((resolve, reject) => {
     // Spawn mongodump command
     const dump = spawn('sudo', [
-      'docker',
-      'exec',
-      '-i',
-      'interview-mongo',
       'mongodump',
+      '--hostname=interview-mongo', // should be service name of mongodb service in docker
       '--username=root',
       '--password=rootpass',
       '--archive',

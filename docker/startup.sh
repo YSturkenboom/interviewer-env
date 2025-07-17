@@ -15,10 +15,28 @@ TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
   
 # Clone repo only if not already cloned
 if [ ! -d "$TARGET_DIR" ]; then
-  echo "📥 Cloning assignment repo into $TARGET_DIR..."
+  echo ":inbox_tray: Cloning assignment repo into $TARGET_DIR..."
   sudo git clone "$REPO_URL" "$TARGET_DIR"
+  # Find and start all npm projects inside the repo
+  echo ":rocket: Setting up projects inside $TARGET_DIR"
+  for dir in "$TARGET_DIR"/*/; do
+    if [ -f "$dir/package.json" ]; then
+      echo ":file_folder: Found project: $dir"
+      (
+        cd "$dir"
+        echo ":package: Installing dependencies..."
+        npm install
+
+        echo ":gear: Starting project in background..."
+        npm start &
+      )
+    fi
+  done
+
+  # Wait for all background `npm start` processes
+  wait
 else
-  echo "✅ Repo already exists at $TARGET_DIR"
+  echo ":white_check_mark: Repo already exists at $TARGET_DIR"
 fi
 
 # Set proper ownership

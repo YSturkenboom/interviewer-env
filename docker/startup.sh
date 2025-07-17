@@ -57,7 +57,7 @@ echo "SESSION_ID: $SESSION_ID"
 echo "🔗 Creating environment variables for frontend..."
 cd $TARGET_DIR/frontend
 sudo cat > .env <<EOF
-REACT_APP_API_URL=https://${SESSION_ID}com/proxy/5000/api
+REACT_APP_API_URL=https://${SESSION_ID}.com/proxy/5000/api
 REACT_APP_BASE_PATH=/absproxy/3000
 EOF
 

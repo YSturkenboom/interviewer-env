@@ -26,9 +26,6 @@ if [ ! -d "$TARGET_DIR" ]; then
         cd "$dir"
         echo ":package: Installing dependencies..."
         sudo npm install
-
-        echo ":gear: Starting project in background..."
-        sudo npm start &
       )
     fi
   done

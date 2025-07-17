@@ -166,7 +166,7 @@ WEBHOOK_PAYLOAD=$(cat <<EOF
   "instance_id": "$INSTANCE_ID",
   "public_ip": "$PUBLIC_IP",
   "session_url": "$SESSION_URL",
-  "subdomain": "$SUBDOMAIN",
+  "subdomain": "${SUBDOMAIN}",
   "interview_taken_id": "$INTERVIEW_TAKEN_ID",
   "challenge_repo": "$CHALLENGE_REPO",
   "workspace_path": "$TARGET_DIR",
@@ -181,8 +181,8 @@ echo "📡 Sending webhook to: $WEBHOOK_URL"
 WEBHOOK_SUCCESS=false
 for i in {1..3}; do
   echo "📡 Webhook attempt $i/3..."
-  
-  WEBHOOK_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$WEBHOOK_URL" \
+  echo "curl -s -L -w POST ${WEBHOOK_URL}";
+  WEBHOOK_RESPONSE=$(curl -s -L -w "\n%{http_code}" -X POST "$WEBHOOK_URL" \
     -H "Content-Type: application/json" \
     -d "$WEBHOOK_PAYLOAD")
   

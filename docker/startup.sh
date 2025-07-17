@@ -112,6 +112,33 @@ echo "🚀 Installing diff tracker extension..."
 echo "🚀 Installing MongoDB extension..."
 /usr/bin/code-server --install-extension mongodb.mongodb-vscode
 
+# 🔧 Setting up IDE settings before starting code-server
+echo "🔧 Setting up IDE settings..."
+sudo cat > /home/coder/.local/share/code-server/User/settings.json <<EOF
+{
+  "remote.autoForwardPorts": false,
+  "remote.portsAttributes": {
+    "3000": {
+      "onAutoForward": "ignore"
+    },
+    "5000": {
+      "onAutoForward": "ignore"
+    }
+  },
+  "markdown.preview.openMarkdownLinks": "inPreview",
+  "workbench.editorAssociations": {
+      "*.md": "vscode.markdown.preview.editor"
+  },
+  "mdb.presetConnections": [
+    {
+      "name": "Code Challenge Database",
+      "connectionString": "mongodb://pizzauser:pizzapass@mongo-db:27017/testdb?authSource=testdb"
+    }
+  ],
+  "security.workspace.trust.enabled": false
+}
+EOF
+
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
 echo "📂 Opening workspace: $TARGET_DIR"

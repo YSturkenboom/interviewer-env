@@ -51,11 +51,13 @@ else
   echo "✅ Node.js is already installed: $(node -v)"
 fi
 
+echo "SESSION_ID: $SESSION_ID"
+
 # 🔗 Create the right environment variables for the projects
 echo "🔗 Creating environment variables for frontend..."
 cd $TARGET_DIR/frontend
 sudo cat > .env <<EOF
-REACT_APP_API_URL=https://${SESSION_ID}.interview-cruit.com/proxy/5000/api
+REACT_APP_API_URL=https://${SESSION_ID}com/proxy/5000/api
 REACT_APP_BASE_PATH=/absproxy/3000
 EOF
 
@@ -116,15 +118,6 @@ echo "🚀 Installing MongoDB extension..."
 echo "🔧 Setting up IDE settings..."
 sudo cat > /home/coder/.local/share/code-server/User/settings.json <<EOF
 {
-  "remote.autoForwardPorts": false,
-  "remote.portsAttributes": {
-    "3000": {
-      "onAutoForward": "ignore"
-    },
-    "5000": {
-      "onAutoForward": "ignore"
-    }
-  },
   "markdown.preview.openMarkdownLinks": "inPreview",
   "workbench.editorAssociations": {
       "*.md": "vscode.markdown.preview.editor"

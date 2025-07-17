@@ -182,7 +182,7 @@ WEBHOOK_SUCCESS=false
 for i in {1..3}; do
   echo "📡 Webhook attempt $i/3..."
   
-  WEBHOOK_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$WEBHOOK_URL" \
+  WEBHOOK_RESPONSE=$(curl -s -L -w "\n%{http_code}" -X POST "$WEBHOOK_URL" \
     -H "Content-Type: application/json" \
     -d "$WEBHOOK_PAYLOAD")
   

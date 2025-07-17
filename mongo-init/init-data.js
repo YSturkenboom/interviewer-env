@@ -1,6 +1,11 @@
 // MongoDB initialization script for pizza store environment
 // This script runs automatically when MongoDB container starts for the first time
 
+const bcryptHashes = {
+  admin: '$2a$10$tfZPDNbG3fnnrWZYqEGDleQ8bGwCFLnOQDMYe.Xin3aDMDWLes/wS', // Replace with real hash
+  user: '$2a$10$lqnCcfy17QPRhMgzaEl9nu/QFs.xFJ1tYEdM0UI/1wqKSmaSKSsMe'   // Replace with real hash
+};
+
 // Switch to the pizza store database
 db = db.getSiblingDB("testdb");
 
@@ -10,7 +15,7 @@ db.users.insertMany([
   {
     _id: ObjectId(),
     email: "admin@example.com",
-    password: "$2b$10$K8BEQNhKU4WkW5pDGj5K8eHXqFAR9dT3JxY9vCjWsN.tLqE2Fz3wO", // test1234
+    password: bcryptHashes.admin,
     role: "admin",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -18,7 +23,7 @@ db.users.insertMany([
   {
     _id: ObjectId(),
     email: "user@example.com",
-    password: "$2b$10$K8BEQNhKU4WkW5pDGj5K8eHXqFAR9dT3JxY9vCjWsN.tLqE2Fz3wO", // test1234
+    password: bcryptHashes.user,
     role: "user",
     createdAt: new Date(),
     updatedAt: new Date(),

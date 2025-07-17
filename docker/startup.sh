@@ -124,7 +124,7 @@ if [ -z "$TOKEN" ]; then
 fi
 
 # Set the webhook URL from environment or use fallback
-WEBHOOK_URL="${WEBHOOK_URL:-https://zenno.loca.lt/api/containers/webhooks}"
+WEBHOOK_URL="${WEBHOOK_URL:-https://cruit-europe.com/api/containers/webhooks}"
 
 # Get instance ID and public IP
 INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \

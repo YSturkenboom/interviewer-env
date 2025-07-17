@@ -64,16 +64,17 @@ app.post("/api/save-workspace", async (req, res) => {
     archive.glob("**/*", {
       cwd: workspaceDir,
       ignore: [
-        "node_modules/**",
-        ".git/**",
-        "dist/**",
-        "build/**",
-        ".next/**",
-        "coverage/**",
-        "*.log",
-        ".env*",
-        ".DS_Store",
-        "Thumbs.db",
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.next/**",
+        "**/coverage/**",
+        "**/*.log",
+        "**/.env",
+        "**/.env.*",
+        "**/.DS_Store",
+        "**/Thumbs.db",
       ],
     });
 
@@ -216,7 +217,7 @@ function streamMongoDumpToS3(bucket, key) {
     // Spawn mongodump command
     const dump = spawn('sudo', [
       'mongodump',
-      '--hostname=interview-mongo', // should be service name of mongodb service in docker
+      '--host=interview-mongo', // should be service name of mongodb service in docker
       '--username=root',
       '--password=rootpass',
       '--archive',

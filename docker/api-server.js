@@ -4,7 +4,7 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
-const { exec } = require("child_process");
+const { spawn } = require("child_process");
 const app = express();
 const PORT = 9000;
 
@@ -210,21 +210,51 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-async function streamMongoDumpToS3(bucket, key) {
+function streamMongoDumpToS3(bucket, key) {
   return new Promise((resolve, reject) => {
-    const s3Path = `s3://${bucket}/${key}`;
+    // Spawn mongodump command
+    const dump = spawn('sudo', [
+      'docker',
+      'exec',
+      '-i',
+      'interview-mongo',
+      'mongodump',
+      '--username=root',
+      '--password=rootpass',
+      '--archive',
+      '--gzip'
+    ]);
 
-    // this should match the mongo-db service name in docker-compose.yml
-    const command = `docker exec mongo-db sh -c 'mongodump --archive --gzip | aws s3 cp - ${s3Path}'`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Error running mongodump:', stderr);
-        return reject(error)
-      }
-
-      console.log('MongoDB dump uploaded to S3:', s3Path);
-      resolve({ message: 'Backup complete', s3Path });
+    // Handle mongodump errors
+    dump.stderr.on('data', (data) => {
+      console.error('mongodump stderr:', data.toString());
     });
-  })
+
+    dump.on('error', (err) => {
+      console.error('Failed to start mongodump:', err);
+      reject(err);
+    });
+
+    // Upload stream to S3
+    const upload = new Upload({
+      client: s3Client,
+      params: {
+        Bucket: bucket,
+        Key: key,
+        Body: dump.stdout,
+        ContentType: 'application/gzip',
+      },
+    });
+
+    upload.done()
+      .then(() => {
+        console.log(`✅ MongoDB dump uploaded to s3://${bucket}/${key}`);
+        resolve({ message: 'Backup complete', s3Path: `s3://${bucket}/${key}` });
+      })
+      .catch((err) => {
+        console.error('❌ Error uploading to S3:', err);
+        reject(err);
+      });
+  });
 }
+

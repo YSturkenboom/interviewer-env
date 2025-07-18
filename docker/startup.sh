@@ -118,6 +118,15 @@ echo "🚀 Installing MongoDB extension..."
 echo "🔧 Setting up IDE settings..."
 sudo cat > /home/coder/.local/share/code-server/User/settings.json <<EOF
 {
+  "remote.autoForwardPorts": false,
+  "remote.portsAttributes": {
+    "3000": {
+      "onAutoForward": "ignore"
+    },
+    "5000": {
+      "onAutoForward": "ignore"
+    }
+  },
   "markdown.preview.openMarkdownLinks": "inPreview",
   "workbench.editorAssociations": {
       "*.md": "vscode.markdown.preview.editor"
@@ -128,7 +137,8 @@ sudo cat > /home/coder/.local/share/code-server/User/settings.json <<EOF
       "connectionString": "mongodb://pizzauser:pizzapass@mongo-db:27017/testdb?authSource=testdb"
     }
   ],
-  "security.workspace.trust.enabled": false
+  "security.workspace.trust.enabled": false,
+  "workbench.startupEditor": "none"
 }
 EOF
 

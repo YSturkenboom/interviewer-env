@@ -1,7 +1,6 @@
 #!/bin/bash
 # docker/startup.sh
-exec > >(tee /var/log/userdata.log | logger -t user-data -s 2>/dev/console) 2>&1
-set -euxo pipefail
+set -uo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 
@@ -118,15 +117,6 @@ echo "🚀 Installing MongoDB extension..."
 echo "🔧 Setting up IDE settings..."
 sudo cat > /home/coder/.local/share/code-server/User/settings.json <<EOF
 {
-  "remote.autoForwardPorts": false,
-  "remote.portsAttributes": {
-    "3000": {
-      "onAutoForward": "ignore"
-    },
-    "5000": {
-      "onAutoForward": "ignore"
-    }
-  },
   "markdown.preview.openMarkdownLinks": "inPreview",
   "workbench.editorAssociations": {
       "*.md": "vscode.markdown.preview.editor"
@@ -137,8 +127,7 @@ sudo cat > /home/coder/.local/share/code-server/User/settings.json <<EOF
       "connectionString": "mongodb://pizzauser:pizzapass@mongo-db:27017/testdb?authSource=testdb"
     }
   ],
-  "security.workspace.trust.enabled": false,
-  "workbench.startupEditor": "none"
+  "security.workspace.trust.enabled": false
 }
 EOF
 

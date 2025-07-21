@@ -1,7 +1,7 @@
 #!/bin/bash
 # docker/startup.sh
-
-set -uo pipefail
+exec > >(tee /var/log/userdata.log | logger -t user-data -s 2>/dev/console) 2>&1
+set -euxo pipefail
 
 echo "🟢 Interview environment setup started at $(date)"
 

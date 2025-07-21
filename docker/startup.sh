@@ -204,6 +204,16 @@ CHALLENGE_REPO="${REPO_URL:-https://github.com/Otellu/pizza-shop-challenge.git}"
 # Construct the session URL
 SESSION_URL="https://${SUBDOMAIN}"
 
+# Read the README.md file if it exists
+README_CONTENT=""
+if [ -f "$TARGET_DIR/README.md" ]; then
+  echo "📖 Reading README.md content..."
+  README_CONTENT=$(cat "$TARGET_DIR/README.md" | jq -Rs .)
+else
+  echo "⚠️ README.md not found in $TARGET_DIR"
+  README_CONTENT=""
+fi
+
 # Prepare webhook payload
 WEBHOOK_PAYLOAD=$(cat <<EOF
 {
@@ -214,6 +224,7 @@ WEBHOOK_PAYLOAD=$(cat <<EOF
   "interview_taken_id": "$INTERVIEW_TAKEN_ID",
   "challenge_repo": "$CHALLENGE_REPO",
   "workspace_path": "$TARGET_DIR",
+  "readme_content": $README_CONTENT,
   "status": "ready",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)"
 }
@@ -222,6 +233,7 @@ EOF
 
 # Send webhook with retry logic
 echo "📡 Sending webhook to: $WEBHOOK_URL"
+echo "📡 Webhook payload: $WEBHOOK_PAYLOAD"
 WEBHOOK_SUCCESS=false
 for i in {1..3}; do
   echo "📡 Webhook attempt $i/3..."

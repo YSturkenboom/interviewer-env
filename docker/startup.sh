@@ -233,7 +233,6 @@ EOF
 
 # Send webhook with retry logic
 echo "📡 Sending webhook to: $WEBHOOK_URL"
-echo "📡 Webhook payload: $WEBHOOK_PAYLOAD"
 WEBHOOK_SUCCESS=false
 for i in {1..3}; do
   echo "📡 Webhook attempt $i/3..."

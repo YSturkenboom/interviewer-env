@@ -1,7 +1,7 @@
 // docker/api-server.js
 const express = require("express");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { Upload } = require("@aws-sdk/lib-storage")
+const { Upload } = require("@aws-sdk/lib-storage");
 const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
@@ -88,43 +88,47 @@ app.post("/api/save-workspace", async (req, res) => {
 
     console.log(`☁️ Uploading to S3...`);
 
-    // Upload to S3
-    const fileStream = fs.createReadStream(zipPath);
-    const key = `interviews/${interviewTakenId}/workspace-${timestamp}.zip`;
+    // Use fixed keys for upsert behavior instead of timestamped keys
+    const workspaceKey = `interviews/${interviewTakenId}/workspace.zip`;
+    const mongoDumpKey = `interviews/${interviewTakenId}/mongo-dump.gz`;
 
+    // Upload workspace to S3 (this will overwrite existing file)
+    const fileStream = fs.createReadStream(zipPath);
     const uploadParams = {
       Bucket: bucket,
-      Key: key,
+      Key: workspaceKey,
       Body: fileStream,
       ContentType: "application/zip",
       Metadata: {
         "interview-id": interviewTakenId,
         "created-at": new Date().toISOString(),
+        "last-updated": new Date().toISOString(),
         type: "workspace-backup",
       },
     };
 
     const result = await s3Client.send(new PutObjectCommand(uploadParams));
+
+    // Upload mongo dump to S3 (this will overwrite existing file)
     try {
-      await streamMongoDumpToS3(
-        bucket,
-        `interviews/${interviewTakenId}/mongo-dump-${timestamp}.gz`
-      );
+      await streamMongoDumpToS3(bucket, mongoDumpKey);
     } catch (e) {
-      console.error("❌ Error saving workspace:", e);
+      console.error("❌ Error saving mongo dump:", e);
     }
+
     // Cleanup temp file
     fs.unlinkSync(zipPath);
 
-    console.log(`✅ Workspace saved successfully to S3: ${key}`);
+    console.log(`✅ Workspace and mongo dump upserted successfully to S3`);
 
     res.json({
       success: true,
-      key: key,
+      workspaceKey: workspaceKey,
+      mongoDumpKey: mongoDumpKey,
       bucket: bucket,
       timestamp: timestamp,
       interviewId: interviewTakenId,
-      message: "Workspace saved successfully",
+      message: "Workspace and mongo dump upserted successfully",
     });
   } catch (error) {
     console.error("❌ Error saving workspace:", error);
@@ -215,45 +219,54 @@ process.on("SIGINT", () => {
 function streamMongoDumpToS3(bucket, key) {
   return new Promise((resolve, reject) => {
     // Spawn mongodump command
-    const dump = spawn('sudo', [
-      'mongodump',
-      '--host=interview-mongo', // should be service name of mongodb service in docker
-      '--username=root',
-      '--password=rootpass',
-      '--archive',
-      '--gzip'
+    const dump = spawn("sudo", [
+      "mongodump",
+      "--host=interview-mongo", // should be service name of mongodb service in docker
+      "--username=root",
+      "--password=rootpass",
+      "--archive",
+      "--gzip",
     ]);
 
     // Handle mongodump errors
-    dump.stderr.on('data', (data) => {
-      console.error('mongodump stderr:', data.toString());
+    dump.stderr.on("data", (data) => {
+      console.error("mongodump stderr:", data.toString());
     });
 
-    dump.on('error', (err) => {
-      console.error('Failed to start mongodump:', err);
+    dump.on("error", (err) => {
+      console.error("Failed to start mongodump:", err);
       reject(err);
     });
 
-    // Upload stream to S3
+    // Upload stream to S3 with metadata
     const upload = new Upload({
       client: s3Client,
       params: {
         Bucket: bucket,
         Key: key,
         Body: dump.stdout,
-        ContentType: 'application/gzip',
+        ContentType: "application/gzip",
+        Metadata: {
+          "interview-id": process.env.INTERVIEW_TAKEN_ID,
+          "created-at": new Date().toISOString(),
+          "last-updated": new Date().toISOString(),
+          type: "mongo-backup",
+        },
       },
     });
 
-    upload.done()
+    upload
+      .done()
       .then(() => {
-        console.log(`✅ MongoDB dump uploaded to s3://${bucket}/${key}`);
-        resolve({ message: 'Backup complete', s3Path: `s3://${bucket}/${key}` });
+        console.log(`✅ MongoDB dump upserted to s3://${bucket}/${key}`);
+        resolve({
+          message: "Backup complete",
+          s3Path: `s3://${bucket}/${key}`,
+        });
       })
       .catch((err) => {
-        console.error('❌ Error uploading to S3:', err);
+        console.error("❌ Error uploading to S3:", err);
         reject(err);
       });
   });
 }
-

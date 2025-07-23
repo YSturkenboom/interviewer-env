@@ -18,8 +18,13 @@ TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
   
 # Clone repo only if not already cloned
 if [ ! -d "$TARGET_DIR" ]; then
-  echo ":inbox_tray: Cloning assignment repo into $TARGET_DIR..."
-  sudo git clone "$REPO_URL" "$TARGET_DIR"
+  if [ "${ENVIRONMENT:-}" = "dev" ]; then
+    echo ":inbox_tray: Cloning assignment repo (dev branch) into $TARGET_DIR..."
+    sudo git clone --branch dev "$REPO_URL" "$TARGET_DIR"
+  else
+    echo ":inbox_tray: Cloning assignment repo into $TARGET_DIR..."
+    sudo git clone "$REPO_URL" "$TARGET_DIR"
+  fi
   # Find and start all npm projects inside the repo
   echo ":rocket: Setting up projects inside $TARGET_DIR"
   for dir in "$TARGET_DIR"/*/; do

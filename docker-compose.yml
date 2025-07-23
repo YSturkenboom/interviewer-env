@@ -19,7 +19,7 @@ services:
       - REPO_URL=${REPO_URL}
       - SUBDOMAIN=${SUBDOMAIN}
       - WEBHOOK_URL=${WEBHOOK_URL}
-
+      - ENVIRONMENT=${ENVIRONMENT}
     volumes:
       - ./workspace:/home/ubuntu/interviewer-env/workspace
     ports:

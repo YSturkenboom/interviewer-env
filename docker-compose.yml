@@ -20,6 +20,10 @@ services:
       - SUBDOMAIN=${SUBDOMAIN}
       - WEBHOOK_URL=${WEBHOOK_URL}
       - ENVIRONMENT=${ENVIRONMENT}
+      - API_URL_VAR_NAME=${API_URL_VAR_NAME}
+      - FRONTEND_ENV_TEMPLATE=${FRONTEND_ENV_TEMPLATE}
+      - BACKEND_ENV_TEMPLATE=${BACKEND_ENV_TEMPLATE}
+      - EXTRA_INSTALL_COMMANDS=${EXTRA_INSTALL_COMMANDS}
     volumes:
       - ./workspace:/home/ubuntu/interviewer-env/workspace
     ports:
@@ -43,7 +47,7 @@ services:
       - mongo_data:/data/db
       - ./mongo-init:/docker-entrypoint-initdb.d # This mounts your init scripts
     ports:
-      - "27017:27017"
+      - "27019:27017"
     networks:
       - interview-net
 

@@ -58,19 +58,67 @@ fi
 echo "SESSION_ID: $SESSION_ID"
 
 # 🔗 Create the right environment variables for the projects
+# using base64 encoded stream to prevent issues with special characters
 echo "🔗 Creating environment variables for frontend..."
-cd $TARGET_DIR/frontend
-sudo cat > .env <<EOF
+cd "$TARGET_DIR/frontend"
+
+if [ -n "${FRONTEND_ENV_TEMPLATE:-}" ]; then
+  echo "📄 Using provided FRONTEND_ENV_TEMPLATE"
+  echo "$FRONTEND_ENV_TEMPLATE" | base64 -d | sudo tee .env > /dev/null
+else
+  echo "📄 Using default .env template"
+  sudo tee .env > /dev/null <<EOF
 REACT_APP_API_URL=https://${SESSION_ID}.com/proxy/5000/api
 REACT_APP_BASE_PATH=/absproxy/3000
 EOF
+fi
 
-cd $TARGET_DIR/backend
-sudo cat > .env <<EOF
+# ✅ Use API_URL_VAR_NAME from env to inject session URL into .env
+if [ -n "${API_URL_VAR_NAME:-}" ]; then
+  SESSION_API_URL="https://${SESSION_ID}.com/proxy/5000/api"
+  ENV_PATH="$TARGET_DIR/frontend/.env"
+  echo "🔧 Injecting session API URL into $ENV_PATH using var: $API_URL_VAR_NAME"
+  # Ensure the file exists
+  sudo touch "$ENV_PATH"
+  # Remove any existing line for the variable
+  sudo sed -i "/^${API_URL_VAR_NAME}=.*/d" "$ENV_PATH"
+  # Add the new line
+  echo "${API_URL_VAR_NAME}=${SESSION_API_URL}" | sudo tee -a "$ENV_PATH"
+  echo "✅ Injected: ${API_URL_VAR_NAME}=${SESSION_API_URL}"
+else
+  echo "⚠️ Skipping .env injection: API_URL_VAR_NAME not defined"
+fi
+
+# 🔗 Create the right environment variables for the backend
+# using base64 encoded stream to prevent issues with special characters
+echo "🔗 Creating environment variables for backend..."
+cd "$TARGET_DIR/backend"
+
+if [ -n "${BACKEND_ENV_TEMPLATE:-}" ]; then
+  echo "📄 Using provided BACKEND_ENV_TEMPLATE"
+  echo "$BACKEND_ENV_TEMPLATE" | base64 -d | sudo tee .env > /dev/null
+else
+  echo "📄 Using default .env template"
+  sudo tee .env > /dev/null <<EOF
 MONGO_URI=mongodb://pizzauser:pizzapass@mongo-db:27017/testdb?authSource=testdb
 PORT=5000
 JWT_SECRET=secret
 EOF
+fi
+
+# 📦 Run extra tech-specific install commands (optional)
+if [ -n "${EXTRA_INSTALL_COMMANDS:-}" ]; then
+  echo "📦 Running EXTRA_INSTALL_COMMANDS..."
+  echo "$EXTRA_INSTALL_COMMANDS" | base64 -d | while IFS= read -r line; do
+    if [[ -n "$line" ]]; then
+      echo "🔧 Running: $line"
+      eval "$line"
+    fi
+  done
+else
+  echo "ℹ️ No EXTRA_INSTALL_COMMANDS to run"
+fi
+
 
 # 🚀 Start API server in background (from correct directory)
 echo "🛠 Starting API Server..."

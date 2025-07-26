@@ -187,6 +187,7 @@ EOF
 # 🔁 Start code-server in background - POINT DIRECTLY TO CHALLENGE DIRECTORY
 echo "🚀 Starting Code Server..."
 echo "📂 Opening workspace: $TARGET_DIR"
+echo "Proxy domain: $SUBDOMAIN"
 /usr/bin/code-server \
   --auth none \
   --host 0.0.0.0 \

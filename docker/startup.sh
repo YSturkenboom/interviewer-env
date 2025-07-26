@@ -191,7 +191,7 @@ echo "📂 Opening workspace: $TARGET_DIR"
   --auth none \
   --host 0.0.0.0 \
   --port 8080 \
-  --proxy-domain='*.interview-cruit.com' \
+  --proxy-domain='session-a2be7173.interview-cruit.com' \
   "$TARGET_DIR" &
 
 CODE_SERVER_PID=$!

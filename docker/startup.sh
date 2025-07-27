@@ -5,10 +5,12 @@ set -uo pipefail
 echo "🟢 Interview environment setup started at $(date)"
 
 # These env variables ensure that the code-server instance starts with the correct proxy setup for a create-react-app project
-export PUBLIC_URL="/absproxy/3000"
-export WDS_SOCKET_PATH="/absproxy/3000/sockjs-node"
+export FRONTEND_PORT=4200
+export PUBLIC_URL="/absproxy/$FRONTEND_PORT"
+export WDS_SOCKET_PATH="/absproxy/$FRONTEND_PORT/sockjs-node"
 export BROWSER="none"
 export VSCODE_PROXY_URI="/absproxy/{{port}}"
+export NG_APP_BASE_PATH="/absproxy/$FRONTEND_PORT"
 
 # Extract subdomain prefix and UUID from SUBDOMAIN
 SESSION_ID=$(echo "$SUBDOMAIN" | sed 's/\.[^.]*$//')

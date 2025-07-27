@@ -29,6 +29,7 @@ services:
     ports:
       - "8443:8080" # code-server port
       - "3000:3000" # frontend preview port
+      - "4200:4200" # frontend preview port (Angular)
       - "5000:5000" # backend preview port
       - "9000:9000" # API server port for workspace operations
     depends_on:

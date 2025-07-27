@@ -71,7 +71,7 @@ else
   echo "📄 Using default .env template"
   sudo tee .env > /dev/null <<EOF
 REACT_APP_API_URL=https://${SESSION_ID}.com/proxy/5000/api
-REACT_APP_BASE_PATH=/absproxy/3000
+REACT_APP_BASE_PATH=/absproxy/4200
 EOF
 fi
 

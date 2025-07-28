@@ -93,10 +93,12 @@ fi
 
 # ! Angular only, hardcoded, make it dynamic
 # 🔧 Update environment.ts file with dynamic session URL
-echo "🔧 Updating frontend environment.ts file..."
+echo "🔧 Updating frontend environment files..."
+SESSION_API_URL="https://${SESSION_ID}.com/proxy/5000/api"
+
+# Update environment.ts
 ENV_TS_PATH="$TARGET_DIR/frontend/src/environments/environment.ts"
 if [ -f "$ENV_TS_PATH" ]; then
-  SESSION_API_URL="https://${SESSION_ID}.com/proxy/5000/api"
   echo "📝 Updating apiUrl in $ENV_TS_PATH to: $SESSION_API_URL"
   
   # Create a temporary file with the updated content
@@ -110,6 +112,24 @@ EOF
   echo "✅ Updated environment.ts with dynamic session URL"
 else
   echo "⚠️ environment.ts file not found at $ENV_TS_PATH"
+fi
+
+# Update environment.prod.ts
+ENV_PROD_TS_PATH="$TARGET_DIR/frontend/src/environments/environment.prod.ts"
+if [ -f "$ENV_PROD_TS_PATH" ]; then
+  echo "📝 Updating apiUrl in $ENV_PROD_TS_PATH to: $SESSION_API_URL"
+  
+  # Create a temporary file with the updated content
+  sudo tee "$ENV_PROD_TS_PATH" > /dev/null <<EOF
+export const environment = {
+  production: true,
+  apiUrl: '$SESSION_API_URL',
+};
+EOF
+  
+  echo "✅ Updated environment.prod.ts with dynamic session URL"
+else
+  echo "⚠️ environment.prod.ts file not found at $ENV_PROD_TS_PATH"
 fi
 
 # 🔗 Create the right environment variables for the backend

@@ -91,6 +91,27 @@ else
   echo "⚠️ Skipping .env injection: API_URL_VAR_NAME not defined"
 fi
 
+# ! Angular only, hardcoded, make it dynamic
+# 🔧 Update environment.ts file with dynamic session URL
+echo "🔧 Updating frontend environment.ts file..."
+ENV_TS_PATH="$TARGET_DIR/frontend/src/environments/environment.ts"
+if [ -f "$ENV_TS_PATH" ]; then
+  SESSION_API_URL="https://${SESSION_ID}.com/proxy/5000/api"
+  echo "📝 Updating apiUrl in $ENV_TS_PATH to: $SESSION_API_URL"
+  
+  # Create a temporary file with the updated content
+  sudo tee "$ENV_TS_PATH" > /dev/null <<EOF
+export const environment = {
+  production: false,
+  apiUrl: '$SESSION_API_URL',
+};
+EOF
+  
+  echo "✅ Updated environment.ts with dynamic session URL"
+else
+  echo "⚠️ environment.ts file not found at $ENV_TS_PATH"
+fi
+
 # 🔗 Create the right environment variables for the backend
 # using base64 encoded stream to prevent issues with special characters
 echo "🔗 Creating environment variables for backend..."

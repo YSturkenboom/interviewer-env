@@ -5,7 +5,7 @@ set -uo pipefail
 echo "🟢 Interview environment setup started at $(date)"
 
 # These env variables ensure that the code-server instance starts with the correct proxy setup for a create-react-app project
-export FRONTEND_PORT=4200
+export FRONTEND_PORT="${FRONTEND_PORT:-4200}"
 export PUBLIC_URL="/absproxy/$FRONTEND_PORT"
 export WDS_SOCKET_PATH="/absproxy/$FRONTEND_PORT/sockjs-node"
 export BROWSER="none"
@@ -71,7 +71,7 @@ else
   echo "📄 Using default .env template"
   sudo tee .env > /dev/null <<EOF
 REACT_APP_API_URL=https://${SESSION_ID}.com/proxy/5000/api
-REACT_APP_BASE_PATH=/absproxy/4200
+REACT_APP_BASE_PATH=/absproxy/${FRONTEND_PORT}
 EOF
 fi
 

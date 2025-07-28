@@ -24,6 +24,7 @@ services:
       - FRONTEND_ENV_TEMPLATE=${FRONTEND_ENV_TEMPLATE}
       - BACKEND_ENV_TEMPLATE=${BACKEND_ENV_TEMPLATE}
       - EXTRA_INSTALL_COMMANDS=${EXTRA_INSTALL_COMMANDS}
+      - FRONTEND_PORT=${FRONTEND_PORT}
     volumes:
       - ./workspace:/home/ubuntu/interviewer-env/workspace
     ports:

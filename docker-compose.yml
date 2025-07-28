@@ -46,7 +46,7 @@ services:
       MONGO_INITDB_DATABASE: testdb
     volumes:
       - mongo_data:/data/db
-      - ./mongo-init:/docker-entrypoint-initdb.d # This mounts your init scripts
+      - ./mongo-angular-init:/docker-entrypoint-initdb.d # This mounts your init scripts
     ports:
       - "27019:27017"
     networks:

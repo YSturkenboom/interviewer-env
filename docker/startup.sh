@@ -14,7 +14,10 @@ export VSCODE_PROXY_URI="/absproxy/{{port}}"
 SESSION_ID=$(echo "$SUBDOMAIN" | sed 's/\.[^.]*$//')
 
 TARGET_DIR="/home/ubuntu/interviewer-env/workspace/$REPO_NAME"
-  
+echo $API_URL_VAR_NAME;
+echo $FRONTEND_ENV_TEMPLATE;
+echo $BACKEND_ENV_TEMPLATE;
+echo $EXTRA_INSTALL_COMMANDS;
 # Clone repo only if not already cloned
 if [ ! -d "$TARGET_DIR" ]; then
   if [ "${ENVIRONMENT:-}" = "dev" ]; then
